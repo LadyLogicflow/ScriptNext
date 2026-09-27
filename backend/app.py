@@ -24,6 +24,7 @@ import ingest as ingest_lib
 import models
 from sharepoint import router as sharepoint_router
 from rechtsquellen import router as rechtsquellen_router
+from feedback import router as feedback_router
 
 logger = logging.getLogger(__name__)
 
@@ -70,6 +71,7 @@ if _PANDORA_PREFIX:
 
 app.include_router(sharepoint_router)
 app.include_router(rechtsquellen_router)
+app.include_router(feedback_router)
 
 
 # ── Startup ──────────────────────────────────────────────────────────────────

@@ -78,6 +78,9 @@ class Chunk(Base):
     if PGVECTOR_AVAILABLE:
         embedding: Mapped[list[float] | None] = mapped_column(Vector(1536), nullable=True)
 
+    quelldatum: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    rechtslage_gueltig_ab: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    ist_veraltet: Mapped[bool] = mapped_column(default=False)
     erstellt_am: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
 
     dokument: Mapped["Dokument"] = relationship(back_populates="chunks")
@@ -138,6 +141,22 @@ class SeminarAbschnitt(Base):
     dauer_minuten: Mapped[int | None] = mapped_column(Integer, nullable=True)
 
     seminar: Mapped["Seminar"] = relationship(back_populates="abschnitte")
+
+
+class SeminarFeedback(Base):
+    """Nutzerfeedback zu einem generierten Seminar."""
+    __tablename__ = "seminar_feedback"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    tenant_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), index=True)
+    seminar_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("seminare.id"), index=True)
+    bewertung: Mapped[str] = mapped_column(
+        SAEnum("gut", "zu_langweilig", "falsche_ebene", name="feedback_bewertung")
+    )
+    kommentar: Mapped[str | None] = mapped_column(String(1000), nullable=True)
+    erstellt_am: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
+
+    seminar: Mapped["Seminar"] = relationship()
 
 
 class SharepointToken(Base):
