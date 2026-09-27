@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>ScriptNext — Sprint 3 Status</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;600;700&family=JetBrains+Mono&display=swap');
+  :root {
+    --navy: #0B2545;
+    --lime: #A3E635;
+    --ink: #15191F;
+    --paper: #F8FAFC;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 48px 32px 120px;
+    line-height: 1.6;
+    position: relative;
+    min-height: 100vh;
+  }
+  header {
+    border-bottom: 3px solid var(--navy);
+    padding-bottom: 24px;
+    margin-bottom: 40px;
+  }
+  .overline {
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 13px;
+    letter-spacing: 0.15em;
+    color: #4D7C0F;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  h1 {
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 44px;
+    line-height: 1.1;
+    color: var(--navy);
+    margin: 0 0 8px;
+  }
+  .subtitle {
+    font-size: 18px;
+    color: var(--navy);
+    opacity: 0.72;
+  }
+  h2 {
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 22px;
+    color: var(--navy);
+    margin-top: 40px;
+    margin-bottom: 12px;
+    border-left: 4px solid var(--lime);
+    padding-left: 12px;
+  }
+  h3 {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--navy);
+    margin-top: 20px;
+    margin-bottom: 6px;
+  }
+  ul, ol { padding-left: 22px; }
+  li { margin-bottom: 6px; }
+  p { margin: 8px 0 12px; }
+  code {
+    background: #E2E8F0;
+    padding: 2px 6px;
+    border-radius: 2px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+  }
+  pre {
+    background: #0B2545;
+    color: #F8FAFC;
+    padding: 16px 20px;
+    border-radius: 4px;
+    overflow-x: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+  .badge {
+    display: inline-block;
+    background: var(--lime);
+    color: var(--navy);
+    padding: 3px 10px;
+    border-radius: 3px;
+    font-size: 12px;
+    font-family: 'Archivo Black', sans-serif;
+    letter-spacing: 0.08em;
+    margin-right: 6px;
+  }
+  .badge-live { background: #16A34A; color: white; }
+  .badge-wip { background: #F59E0B; color: white; }
+  .badge-todo { background: #94A3B8; color: white; }
+  .box {
+    background: white;
+    border: 1px solid #E2E8F0;
+    border-left: 4px solid var(--navy);
+    padding: 16px 20px;
+    margin: 16px 0;
+    border-radius: 3px;
+  }
+  .box.live { border-left-color: #16A34A; background: #F0FDF4; }
+  .box.wip { border-left-color: #F59E0B; background: #FFFBEB; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0;
+    background: white;
+    border: 1px solid #E2E8F0;
+    border-radius: 3px;
+  }
+  th, td {
+    text-align: left;
+    padding: 8px 12px;
+    border-bottom: 1px solid #CBD5E1;
+    vertical-align: top;
+  }
+  th {
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 13px;
+    color: var(--navy);
+    letter-spacing: 0.05em;
+    background: #F1F5F9;
+  }
+  footer {
+    margin-top: 60px;
+    padding-top: 20px;
+    border-top: 1px solid #CBD5E1;
+    font-size: 12px;
+    color: var(--ink);
+    opacity: 0.6;
+  }
+  .chevron {
+    position: fixed;
+    right: 24px;
+    bottom: 20px;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    font-size: 44px;
+    color: var(--lime);
+    opacity: 0.9;
+    pointer-events: none;
+    line-height: 1;
+  }
+  @media (max-width: 640px) {
+    body { padding: 24px 16px 100px; }
+    h1 { font-size: 32px; }
+    h2 { font-size: 18px; }
+    .chevron { font-size: 32px; right: 12px; bottom: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="overline">Sprint-3-Status · Stand 27.09.2026 · 21:35 · Docky</div>
+  <h1>ScriptNext Sprint 3</h1>
+  <div class="subtitle">Produktionsreife-Sprint · vier Etappen · GitHub statt Pandora-Preview (Plattform-Bug)</div>
+</header>
+
+<h2>1. Sprint-3-Überblick</h2>
+
+<p>Sprint 3 zielt auf Produktionsreife. Vier Etappen, jede mit Backend + Frontend + Doku, jede nacheinander verifiziert und einzeln nach GitHub gepusht. Wegen des Pandora-Preview-Bugs vom 26.09. läuft keine Live-Preview, aber der Code ist vollständig auf GitHub versionsgesichert und lokal getestet.</p>
+
+<table>
+<tr><th>Etappe</th><th>Backend</th><th>Frontend</th><th>Doku</th></tr>
+<tr><td><b>3a</b> SharePoint-Anbindung</td><td><span class="badge badge-live">LIVE</span> 17 Tests</td><td><span class="badge badge-live">LIVE</span></td><td>—</td></tr>
+<tr><td><b>3b</b> Rechtsquellen-DB + Zitier-Guard</td><td><span class="badge badge-live">LIVE</span> 20 Tests</td><td><span class="badge badge-live">LIVE</span></td><td><span class="badge badge-live">LIVE</span></td></tr>
+<tr><td><b>3c</b> Feedback + Themen-Versionierung</td><td><span class="badge badge-live">LIVE</span> 14 Tests</td><td><span class="badge badge-live">LIVE</span></td><td><span class="badge badge-live">LIVE</span></td></tr>
+<tr><td><b>3d</b> Multi-User + Rate-Limiting</td><td><span class="badge badge-live">LIVE</span> 19 Tests</td><td><span class="badge badge-wip">OFFEN</span></td><td>—</td></tr>
+</table>
+
+<p><b>Insgesamt Backend-Tests neu in Sprint 3: 70</b>, alle grün. Frontend: Smoke- und Component-Tests je Screen.</p>
+
+<h2>2. GitHub-Commits</h2>
+
+<p>Repo: <a href="https://github.com/LadyLogicflow/ScriptNext"><code>https://github.com/LadyLogicflow/ScriptNext</code></a></p>
+
+<pre>2bef3d0 feat(backend):  Sprint 3d – Multi-User-Rollen &amp; Rate-Limiting (19 Tests)  ← Sorty
+53337ad docs:           Sprint 3c – Themen-Versionierung &amp; Feedback-Schleife    ← Docky
+363180a feat(frontend): Sprint 3c – Chunk-Warnbadge im Themen-Screen             ← Weby
+f1aea5f feat(frontend): Sprint 3c – FeedbackWidget-Komponente                    ← Weby
+e3eecf3 feat(backend):  Sprint 3c – Feedback-Schleife &amp; Themen-Versionierung    ← Sorty
+4352764 docs:           Sprint 3b – Rechtsquellen-Schema                         ← Docky
+32943cd feat(frontend): Sprint 3b – Rechtsquellen-Übersicht                     ← Weby
+3733d5a feat(backend):  Sprint 3b – Rechtsquellen-DB + Zitier-Guard              ← Sorty
+e8c7dc2 feat(frontend): Sprint 3a – SharePoint-Login/Ordner-Picker/Import        ← Weby
+9f98fb4 feat(backend):  Sprint 3a – SharePoint-Anbindung                         ← Sorty</pre>
+
+<h2>3. Etappe 3a — SharePoint-Anbindung</h2>
+
+<div class="box live">
+<h3><span class="badge badge-live">LIVE</span> Microsoft-Graph-Anbindung mit Device-Code-Flow</h3>
+<p><b>Endpoints:</b> <code>POST /sharepoint/verbindung</code> · <code>GET /sharepoint/verbindung/status</code> · <code>GET /sharepoint/ordner</code> · <code>POST /sharepoint/import</code></p>
+<p><b>Flow:</b> Client startet Device-Code, User authentifiziert bei <code>microsoft.com/devicelogin</code>, Client pollt Status (5s), gespeicherter Refresh-Token wird verschlüsselt in DB abgelegt (pro Tenant).</p>
+<p><b>Frontend:</b> Login-Screen mit großem User-Code, Ordner-Picker (Sites → Drives → Baum), Import-Fortschritt.</p>
+<p><b>Env-Vars nötig (Azure App-Registrierung):</b> <code>SCRIPTNEXT_SHAREPOINT_CLIENT_ID</code> (Pflicht), <code>SCRIPTNEXT_SHAREPOINT_AUTHORITY</code>, <code>SCRIPTNEXT_SHAREPOINT_TOKEN_KEY</code>.</p>
+</div>
+
+<h2>4. Etappe 3b — Rechtsquellen-DB &amp; Zitier-Guard</h2>
+
+<div class="box live">
+<h3><span class="badge badge-live">LIVE</span> Verifizierte Rechtsquellen aus offiziellen Feeds</h3>
+<p><b>Quellen:</b> Gesetze-im-Internet (XML), BFH-Datenbank, BMF-Schreiben. Import idempotent (Unique <code>externe_id</code>).</p>
+<p><b>Endpoints:</b> <code>POST /rechtsquellen/import</code> · <code>GET /rechtsquellen</code> mit Filter (typ, Volltext) · <code>GET /rechtsquellen/{id}</code></p>
+<p><b>Zitier-Guard scharf:</b> KI-Prompt lehnt Zitat ohne DB-Treffer ab — schreibt „Quelle offen" statt zu halluzinieren.</p>
+<p><b>Frontend:</b> Rechtsquellen-Übersicht mit Filter-Buttons, Debounce-Suche, Detail-Modal.</p>
+<p><b>Doku:</b> <code>docs/Rechtsquellen-Schema.html</code></p>
+</div>
+
+<h2>5. Etappe 3c — Feedback-Schleife &amp; Themen-Versionierung</h2>
+
+<div class="box live">
+<h3><span class="badge badge-live">LIVE</span> Rückkopplung von Trainern + Warnhinweis bei veralteter Rechtslage</h3>
+<p><b>Endpoints:</b> <code>POST /seminare/{id}/feedback</code> · <code>GET /seminare/{id}/feedback</code> · <code>GET /chunks/veraltet</code></p>
+<p><b>Feedback:</b> 3 Bewertungen (gut / zu_langweilig / falsche_ebene) + optionaler Kommentar. Aggregat fließt in Didaktik-KI-Prompt der nächsten Seminar-Generierung.</p>
+<p><b>Versionierung:</b> Chunks tragen <code>quelldatum</code> + <code>rechtslage_gueltig_ab</code>. Automatische Veraltet-Erkennung (365 Tage). UI zeigt Warnbadge in Themen-Karten mit Detail-Modal.</p>
+<p><b>Frontend:</b> Wiederverwendbare <code>FeedbackWidget</code>-Komponente + Chunk-Warnbadge im Themen-Screen.</p>
+<p><b>Doku:</b> <code>docs/Themen-Versionierung.html</code></p>
+</div>
+
+<h2>6. Etappe 3d — Multi-User &amp; Rate-Limiting</h2>
+
+<div class="box wip">
+<h3><span class="badge badge-live">LIVE</span> Backend / <span class="badge badge-wip">OFFEN</span> Frontend — Nutzer-Verwaltung, Rollen, API-Härtung</h3>
+<p><b>Backend (2bef3d0):</b></p>
+<ul>
+<li><code>GET/POST/PATCH/DELETE /admin/nutzer</code> (Admin only, via <code>admin_erforderlich</code>-Dependency)</li>
+<li>Drei Rollen: <code>admin</code> (alles), <code>editor</code> (Upload/Generierung/Feedback), <code>viewer</code> (nur lesen)</li>
+<li>Rate-Limiting mit slowapi: KI 10/min, Import 5/min, Auth 20/min — pro Tenant+User (Auth pro IP für Brute-Force-Schutz)</li>
+<li>Admin-Bootstrap via <code>SCRIPTNEXT_ADMIN_EMAIL</code> + <code>SCRIPTNEXT_ADMIN_PASSWORT</code> beim ersten Start</li>
+<li>Rolle im JWT-Payload → Frontend kennt Berechtigungen ohne Extra-Roundtrip</li>
+<li>19 Tests grün</li>
+</ul>
+<p><b>Frontend (offen):</b> User-Verwaltungs-UI (Nutzer-Liste, Anlegen-Modal, Rollen-Dropdown, Deaktivieren mit Bestätigung). Nur sichtbar für <code>admin</code>-Rolle. Kommt in Webys nächster frischer Session.</p>
+</div>
+
+<h2>7. Offen für Sprint-3-Abschluss</h2>
+
+<ol>
+<li><b>Weby 3d-Frontend</b> — User-Verwaltungs-UI (siehe oben)</li>
+<li><b>Rechtsquellen-DB-Content</b> — Importer sind gebaut, aber noch nicht mit realen Daten gefüttert. Erste Importe (Gesetze-im-Internet, BFH, BMF) sollten in Prod-Umgebung laufen.</li>
+<li><b>MVP-Admin-Passwort rotieren</b> (Bestandsaufgabe aus Sprint 2) — kann jetzt sauber über die neue User-Verwaltung.</li>
+<li><b>Azure-App-Registrierung</b> für SharePoint-Anbindung — catrin muss <code>SCRIPTNEXT_SHAREPOINT_CLIENT_ID</code> im Azure-Portal anlegen und Env-Var setzen.</li>
+</ol>
+
+<h2>8. Deployment-Situation</h2>
+
+<div class="box wip">
+<h3>Pandora-Preview aktuell nicht nutzbar</h3>
+<p>Seit 26.09. registriert der Pandora-Preview-Proxy keine neuen Subdomains mehr. Sprint-3-Code läuft daher nicht als Live-Preview auf Pandora. Alternative-Plan läuft: Deploy auf catrins Raspberry Pi (Tailscale + Docker) über SSH-Deploy-Key. Schrittweise Einrichtung ist in Arbeit (Kontext-ID <code>225ea328-fbdc-411f-b614-e82916ec4daa</code>).</p>
+</div>
+
+<h2>9. Ausblick Sprint 4 (Vorschlag)</h2>
+
+<ul>
+<li>Seminar-Vorschau-Screen im Frontend (aus Sprint 2b verschoben) — mit Abschnitts-Bearbeitung und integriertem FeedbackWidget</li>
+<li>Feedback-Admin-Panel (aggregierte Statistik pro Seminar)</li>
+<li>Themen-Split-UI vervollständigen (falls noch offen aus Sprint 2b)</li>
+<li>CI-Templates für Word/PowerPoint-Export (Layout-Feinschliff)</li>
+<li>PWA-Support (Desktop-Icon, offline-freundlich) — falls catrin es doch will</li>
+</ul>
+
+<footer>
+ScriptNext · Sprint-3-Status · Stand 27.09.2026 · 21:35 · Docky · Repo: <a href="https://github.com/LadyLogicflow/ScriptNext">LadyLogicflow/ScriptNext</a>
+</footer>
+
+<div class="chevron">&gt;</div>
+
+</body>
+</html>
