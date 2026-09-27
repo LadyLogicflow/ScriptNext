@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>ScriptNext — Themen-Versionierung &amp; Feedback</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;600;700&family=JetBrains+Mono&display=swap');
+  :root {
+    --navy: #0B2545;
+    --lime: #A3E635;
+    --ink: #15191F;
+    --paper: #F8FAFC;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 48px 32px 120px;
+    line-height: 1.6;
+    position: relative;
+    min-height: 100vh;
+  }
+  header {
+    border-bottom: 3px solid var(--navy);
+    padding-bottom: 24px;
+    margin-bottom: 40px;
+  }
+  .overline {
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 13px;
+    letter-spacing: 0.15em;
+    color: #4D7C0F;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  h1 {
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 44px;
+    line-height: 1.1;
+    color: var(--navy);
+    margin: 0 0 8px;
+  }
+  .subtitle {
+    font-size: 18px;
+    color: var(--navy);
+    opacity: 0.72;
+  }
+  h2 {
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 22px;
+    color: var(--navy);
+    margin-top: 40px;
+    margin-bottom: 12px;
+    border-left: 4px solid var(--lime);
+    padding-left: 12px;
+  }
+  h3 {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--navy);
+    margin-top: 20px;
+    margin-bottom: 6px;
+  }
+  ul, ol { padding-left: 22px; }
+  li { margin-bottom: 6px; }
+  p { margin: 8px 0 12px; }
+  code {
+    background: #E2E8F0;
+    padding: 2px 6px;
+    border-radius: 2px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+  }
+  pre {
+    background: #0B2545;
+    color: #F8FAFC;
+    padding: 16px 20px;
+    border-radius: 4px;
+    overflow-x: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+  .box {
+    background: white;
+    border: 1px solid #E2E8F0;
+    border-left: 4px solid var(--navy);
+    padding: 16px 20px;
+    margin: 16px 0;
+    border-radius: 3px;
+  }
+  .box.warn {
+    border-left-color: #F59E0B;
+    background: #FFFBEB;
+  }
+  .box.warn h3 { color: #78350F; margin-top: 0; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0;
+    background: white;
+    border: 1px solid #E2E8F0;
+    border-radius: 3px;
+  }
+  th, td {
+    text-align: left;
+    padding: 8px 12px;
+    border-bottom: 1px solid #CBD5E1;
+    vertical-align: top;
+  }
+  th {
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 13px;
+    color: var(--navy);
+    letter-spacing: 0.05em;
+    background: #F1F5F9;
+  }
+  .badge {
+    display: inline-block;
+    background: var(--lime);
+    color: var(--navy);
+    padding: 3px 10px;
+    border-radius: 3px;
+    font-size: 12px;
+    font-family: 'Archivo Black', sans-serif;
+    letter-spacing: 0.08em;
+    margin-right: 6px;
+  }
+  .badge-warn {
+    background: #F59E0B;
+    color: white;
+  }
+  footer {
+    margin-top: 60px;
+    padding-top: 20px;
+    border-top: 1px solid #CBD5E1;
+    font-size: 12px;
+    color: var(--ink);
+    opacity: 0.6;
+  }
+  .chevron {
+    position: fixed;
+    right: 24px;
+    bottom: 20px;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    font-size: 44px;
+    color: var(--lime);
+    opacity: 0.9;
+    pointer-events: none;
+    line-height: 1;
+  }
+  @media (max-width: 640px) {
+    body { padding: 24px 16px 100px; }
+    h1 { font-size: 32px; }
+    h2 { font-size: 18px; }
+    .chevron { font-size: 32px; right: 12px; bottom: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="overline">Sprint-3c-Doku · Stand 27.09.2026 · Docky</div>
+  <h1>Themen-Versionierung &amp; Feedback</h1>
+  <div class="subtitle">Wie ScriptNext veraltete Inhalte erkennt, warnt und die KI lernt</div>
+</header>
+
+<h2>1. Warum Versionierung?</h2>
+
+<div class="box warn">
+<h3>Das Problem: alternde Steuer-Inhalte</h3>
+<p>Steuerrecht ändert sich laufend. Ein Skript, das 2023 auf einem älteren §-Stand basiert, ist 2026 möglicherweise veraltet — mit Aktenzeichen, Freibeträgen oder Verfahrenswegen, die inzwischen anders sind. Wenn eine Beratungsstelle daraus ein Seminar generiert, kann das im schlimmsten Fall zu Falschinformationen führen.</p>
+<p><b>Lösung:</b> Jeder Chunk (Wissens-Baustein) trägt Versions-Metadaten. Das UI zeigt einen Warnbadge, wenn die Quelle veraltet ist. Die KI weiß Bescheid und kann proaktiv „bitte aktualisieren" vorschlagen.</p>
+</div>
+
+<h2>2. Versions-Metadaten pro Chunk</h2>
+
+<table>
+<tr><th>Feld</th><th>Typ</th><th>Bedeutung</th></tr>
+<tr><td><code>quelldatum</code></td><td>Date</td><td>Datum der Quelle (PDF-Metadaten, sonst Import-Zeitpunkt).</td></tr>
+<tr><td><code>rechtslage_gueltig_ab</code></td><td>Date (optional)</td><td>Datum, ab dem die im Chunk beschriebene Rechtslage gilt. Kommt aus dem KI-Erkennungslauf beim Chunking.</td></tr>
+<tr><td><code>ist_veraltet</code></td><td>bool (computed)</td><td>Automatisch: <code>rechtslage_gueltig_ab + 365 Tage &lt; heute</code>. Wird als Warnhinweis-Kriterium genutzt.</td></tr>
+</table>
+
+<h2>3. Ablauf: vom Import zum Warnhinweis</h2>
+
+<ol>
+<li><b>Import</b> — PDF wird hochgeladen (Web-UI) oder aus SharePoint gezogen. Metadaten (Erstellungsdatum, Titel) werden ausgelesen.</li>
+<li><b>Chunking</b> — Text wird in Themen-Chunks zerlegt. Für jeden Chunk läuft eine kurze KI-Analyse: „Wann gilt die hier beschriebene Rechtslage frühestens?" → befüllt <code>rechtslage_gueltig_ab</code>.</li>
+<li><b>Speicherung</b> — Chunks landen mit Versions-Metadaten in der DB, samt pgvector-Embedding.</li>
+<li><b>Nutzung</b> — Bei jeder Seminar-Generierung werden Chunks abgerufen. Die Themen-Übersicht zeigt <span class="badge badge-warn">Gesetzeslage geändert am DD.MM.YYYY</span> bei veralteten Chunks.</li>
+<li><b>Update-Hinweis</b> — <code>GET /api/v1/chunks/veraltet</code> liefert dem Admin eine Liste mit Vorschlag „neu einlesen aus SharePoint oder Upload".</li>
+</ol>
+
+<h2>4. Feedback-Schleife</h2>
+
+<p>Nach jedem generierten Seminar kann der Trainer eine Bewertung abgeben. Das ist der zweite Lernmechanismus (neben Versionierung):</p>
+
+<h3>Feedback-Optionen</h3>
+
+<ul>
+<li><b>gut</b> — Seminar passt.</li>
+<li><b>zu langweilig</b> — didaktisch zu monoton, zu textlastig.</li>
+<li><b>falsche Ebene</b> — Sprachniveau oder Vorwissen falsch getroffen.</li>
+</ul>
+
+<p>Optional kann ein Freitext-Kommentar (max. 1000 Zeichen) mitgegeben werden.</p>
+
+<h3>Wie die KI daraus lernt</h3>
+
+<p>Feedback wird pro Zielgruppe aggregiert. Bei einer Neu-Generierung für die gleiche Zielgruppe wird das Aggregat als Zusatz-Signal in den Didaktik-KI-Prompt gegeben:</p>
+
+<pre>Zielgruppe: Steuer-Anfänger (Beratungsstelle)
+Letzte 12 Feedback-Runden: 8× gut, 2× zu_langweilig, 2× falsche_ebene
+Regel: bei „zu langweilig" mehr Beispiele/Übungen einbauen.
+       bei „falsche Ebene" Sprachniveau eine Stufe einfacher.</pre>
+
+<p>So passt sich die KI über Zeit an, ohne dass ein Mensch Prompts manuell tunen muss.</p>
+
+<h2>5. API-Endpoints (Sprint 3c)</h2>
+
+<pre>POST /api/v1/seminare/{id}/feedback
+     Body:     { bewertung, kommentar? }
+     Response: { id, gespeichert_am }
+
+GET  /api/v1/seminare/{id}/feedback
+     Response: { gesamt, gut, zu_langweilig, falsche_ebene, letztes_feedback }
+
+GET  /api/v1/chunks/veraltet
+     Response: { items: [...], total }</pre>
+
+<h2>6. UI-Darstellung</h2>
+
+<h3>Warnbadge im Themen-Screen</h3>
+
+<div class="box warn">
+<h3><span class="badge badge-warn">⚠️ VERALTET</span> Beispiel: „Kindergeld-Berechnung 2022"</h3>
+<p>Chunk basiert auf Skript vom 12.03.2022. Rechtslage möglicherweise durch Neufassung 2024 überholt. → <b>Empfehlung: Thema neu einlesen aus SharePoint oder Upload.</b></p>
+</div>
+
+<h3>Feedback-Widget nach Seminar-Vorschau</h3>
+
+<p>Drei große Buttons unter der Seminar-Vorschau, optionales Textfeld darunter. Ein Klick schließt das Widget und zeigt „Danke für die Rückmeldung! Wir lernen daraus." — Feedback ist anonym pro Trainer, aber pro <code>tenant_id</code>+<code>seminar_id</code> aggregiert.</p>
+
+<h2>7. Datenschutz</h2>
+
+<ul>
+<li><b>Feedback</b> enthält keine personenbezogenen Daten (keine Trainer-ID gespeichert, nur <code>tenant_id</code>).</li>
+<li><b>Kommentare</b> werden geloggt und dürfen keine personenbezogenen Daten enthalten — das UI-Widget zeigt einen Hinweis „Bitte keine Namen oder Adressen im Kommentar".</li>
+<li><b>Chunk-Warnhinweise</b> sind rein technisch (Datumsangaben), unproblematisch.</li>
+</ul>
+
+<footer>
+ScriptNext · Themen-Versionierung &amp; Feedback · Stand 27.09.2026 · Docky · Ergänzung zu Sprint 3c (Feedback-Endpoint + Versions-Metadaten + Veraltet-Erkennung).
+</footer>
+
+<div class="chevron">&gt;</div>
+
+</body>
+</html>
