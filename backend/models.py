@@ -8,9 +8,11 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from database import Base
 
+import os
 try:
     from pgvector.sqlalchemy import Vector
-    PGVECTOR_AVAILABLE = True
+    _pgvector_env = os.environ.get("SCRIPTNEXT_PGVECTOR_ENABLED", "false").lower()
+    PGVECTOR_AVAILABLE = _pgvector_env == "true"
 except ImportError:
     PGVECTOR_AVAILABLE = False
 
@@ -95,7 +97,70 @@ class Thema(Base):
 
     dokument: Mapped["Dokument"] = relationship(back_populates="themen")
     chunks: Mapped[list["Chunk"]] = relationship(back_populates="thema")
+    seminare: Mapped[list["Seminar"]] = relationship(back_populates="thema", cascade="all, delete-orphan")
 
     @property
     def chunk_count(self) -> int:
         return len(self.chunks)
+
+
+class Seminar(Base):
+    __tablename__ = "seminare"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    tenant_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), index=True)
+    thema_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("themen.id"), index=True)
+    titel: Mapped[str] = mapped_column(String(500))
+    zielgruppe: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    dauer_minuten: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    lernziele: Mapped[str | None] = mapped_column(Text, nullable=True)
+    erstellt_am: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
+    aktualisiert_am: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, onupdate=_now)
+
+    thema: Mapped["Thema"] = relationship(back_populates="seminare")
+    abschnitte: Mapped[list["SeminarAbschnitt"]] = relationship(
+        back_populates="seminar", cascade="all, delete-orphan", order_by="SeminarAbschnitt.reihenfolge"
+    )
+
+
+class SeminarAbschnitt(Base):
+    __tablename__ = "seminar_abschnitte"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    seminar_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("seminare.id"), index=True)
+    reihenfolge: Mapped[int] = mapped_column(Integer)
+    typ: Mapped[str] = mapped_column(
+        SAEnum("einstieg", "inhalt", "uebung", "abschluss", name="abschnitt_typ"), default="inhalt"
+    )
+    titel: Mapped[str] = mapped_column(String(500))
+    inhalt: Mapped[str | None] = mapped_column(Text, nullable=True)
+    w_frage: Mapped[str | None] = mapped_column(Text, nullable=True)
+    dauer_minuten: Mapped[int | None] = mapped_column(Integer, nullable=True)
+
+    seminar: Mapped["Seminar"] = relationship(back_populates="abschnitte")
+
+
+class SharepointToken(Base):
+    """Gespeicherter MSAL-Token-Cache je Tenant für SharePoint-Zugriff."""
+    __tablename__ = "sharepoint_tokens"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    tenant_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), unique=True, index=True)
+    encrypted_token: Mapped[str] = mapped_column(Text)  # serialisierter MSAL-Cache, ggf. Fernet-verschlüsselt
+    account_upn: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    expires_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    erstellt_am: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
+    aktualisiert_am: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, onupdate=_now)
+
+
+class Rechtsquelle(Base):
+    """Skeleton für verifizierte Rechtsquellen-DB — wird in späteren Sprints befüllt."""
+    __tablename__ = "rechtsquellen"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    titel: Mapped[str] = mapped_column(String(500))
+    paragraph: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    gesetz: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    fundstelle: Mapped[str | None] = mapped_column(Text, nullable=True)
+    gueltig_ab: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    erstellt_am: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
