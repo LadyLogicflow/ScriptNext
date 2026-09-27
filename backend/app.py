@@ -23,6 +23,7 @@ from database import get_db, engine, Base
 import ingest as ingest_lib
 import models
 from sharepoint import router as sharepoint_router
+from rechtsquellen import router as rechtsquellen_router
 
 logger = logging.getLogger(__name__)
 
@@ -68,6 +69,7 @@ if _PANDORA_PREFIX:
     app.add_middleware(_StripPrefixMiddleware)
 
 app.include_router(sharepoint_router)
+app.include_router(rechtsquellen_router)
 
 
 # ── Startup ──────────────────────────────────────────────────────────────────

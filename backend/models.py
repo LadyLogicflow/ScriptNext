@@ -154,13 +154,21 @@ class SharepointToken(Base):
 
 
 class Rechtsquelle(Base):
-    """Skeleton für verifizierte Rechtsquellen-DB — wird in späteren Sprints befüllt."""
+    """Verifizierte Rechtsquellen-DB (Gesetze, BFH-Urteile, BMF-Schreiben)."""
     __tablename__ = "rechtsquellen"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     titel: Mapped[str] = mapped_column(String(500))
+    typ: Mapped[str] = mapped_column(
+        SAEnum("gesetz", "urteil", "schreiben", name="rechtsquelle_typ"), default="gesetz", index=True
+    )
     paragraph: Mapped[str | None] = mapped_column(String(100), nullable=True)
     gesetz: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    aktenzeichen: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    volltext: Mapped[str | None] = mapped_column(Text, nullable=True)
+    quelle_url: Mapped[str | None] = mapped_column(String(1000), nullable=True)
+    datum: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     fundstelle: Mapped[str | None] = mapped_column(Text, nullable=True)
     gueltig_ab: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    externe_id: Mapped[str | None] = mapped_column(String(500), nullable=True, unique=True, index=True)
     erstellt_am: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
