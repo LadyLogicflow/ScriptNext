@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>ScriptNext — Rechtsquellen-Schema</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;600;700&family=JetBrains+Mono&display=swap');
+  :root {
+    --navy: #0B2545;
+    --lime: #A3E635;
+    --ink: #15191F;
+    --paper: #F8FAFC;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 48px 32px 120px;
+    line-height: 1.6;
+    position: relative;
+    min-height: 100vh;
+  }
+  header {
+    border-bottom: 3px solid var(--navy);
+    padding-bottom: 24px;
+    margin-bottom: 40px;
+  }
+  .overline {
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 13px;
+    letter-spacing: 0.15em;
+    color: #4D7C0F;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  h1 {
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 44px;
+    line-height: 1.1;
+    color: var(--navy);
+    margin: 0 0 8px;
+  }
+  .subtitle {
+    font-size: 18px;
+    color: var(--navy);
+    opacity: 0.72;
+  }
+  h2 {
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 22px;
+    color: var(--navy);
+    margin-top: 40px;
+    margin-bottom: 12px;
+    border-left: 4px solid var(--lime);
+    padding-left: 12px;
+  }
+  h3 {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--navy);
+    margin-top: 20px;
+    margin-bottom: 6px;
+  }
+  ul, ol { padding-left: 22px; }
+  li { margin-bottom: 6px; }
+  p { margin: 8px 0 12px; }
+  code {
+    background: #E2E8F0;
+    padding: 2px 6px;
+    border-radius: 2px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+  }
+  pre {
+    background: #0B2545;
+    color: #F8FAFC;
+    padding: 16px 20px;
+    border-radius: 4px;
+    overflow-x: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+  .badge {
+    display: inline-block;
+    background: var(--lime);
+    color: var(--navy);
+    padding: 3px 10px;
+    border-radius: 3px;
+    font-size: 12px;
+    font-family: 'Archivo Black', sans-serif;
+    letter-spacing: 0.08em;
+    margin-right: 6px;
+  }
+  .box {
+    background: white;
+    border: 1px solid #E2E8F0;
+    border-left: 4px solid var(--navy);
+    padding: 16px 20px;
+    margin: 16px 0;
+    border-radius: 3px;
+  }
+  .box.warn {
+    border-left-color: #DC2626;
+    background: #FEF2F2;
+  }
+  .box.warn h3 { color: #7F1D1D; margin-top: 0; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0;
+    background: white;
+    border: 1px solid #E2E8F0;
+    border-radius: 3px;
+  }
+  th, td {
+    text-align: left;
+    padding: 8px 12px;
+    border-bottom: 1px solid #CBD5E1;
+    vertical-align: top;
+  }
+  th {
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 13px;
+    color: var(--navy);
+    letter-spacing: 0.05em;
+    background: #F1F5F9;
+  }
+  footer {
+    margin-top: 60px;
+    padding-top: 20px;
+    border-top: 1px solid #CBD5E1;
+    font-size: 12px;
+    color: var(--ink);
+    opacity: 0.6;
+  }
+  .chevron {
+    position: fixed;
+    right: 24px;
+    bottom: 20px;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    font-size: 44px;
+    color: var(--lime);
+    opacity: 0.9;
+    pointer-events: none;
+    line-height: 1;
+  }
+  @media (max-width: 640px) {
+    body { padding: 24px 16px 100px; }
+    h1 { font-size: 32px; }
+    h2 { font-size: 18px; }
+    .chevron { font-size: 32px; right: 12px; bottom: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="overline">Sprint-3-Doku · Stand 27.09.2026 · Docky</div>
+  <h1>Rechtsquellen-DB</h1>
+  <div class="subtitle">Schema, Import-Prozess, Zitier-Guard — Kernbaustein gegen KI-Halluzinationen</div>
+</header>
+
+<h2>1. Warum eine eigene Rechtsquellen-DB?</h2>
+
+<div class="box warn">
+<h3>Das Kernproblem</h3>
+<p>LLMs erfinden Aktenzeichen, Paragraphen und BMF-Schreiben mit hoher Plausibilität. Ein Zitat wie „BFH-Urteil vom 12.03.2023, VI R 42/22" klingt echt, kann aber komplett frei erfunden sein. Wenn solche Referenzen in einem Seminar-Skript stehen und nicht existieren, ist das rechtlich heikel und rufschädigend.</p>
+<p><b>Lösung:</b> Rechtliche Verweise dürfen NICHT frei aus dem KI-Gedächtnis kommen. Sie dürfen NUR aus einer verifizierten Quellendatenbank stammen. Der Zitier-Guard-Prompt zwingt die KI, ohne DB-Treffer stattdessen „Quelle offen" zu schreiben.</p>
+</div>
+
+<h2>2. DB-Schema</h2>
+
+<p>Tabelle <code>rechtsquellen</code>:</p>
+
+<table>
+<tr><th>Feld</th><th>Typ</th><th>Bedeutung</th></tr>
+<tr><td><code>id</code></td><td>UUID</td><td>Interner Primärschlüssel</td></tr>
+<tr><td><code>tenant_id</code></td><td>UUID</td><td>Mandantenzuordnung (falls Kunde eigene Zusatzquellen pflegen darf)</td></tr>
+<tr><td><code>typ</code></td><td>enum</td><td><code>gesetz</code> · <code>urteil</code> · <code>schreiben</code></td></tr>
+<tr><td><code>titel</code></td><td>Text</td><td>Kurzform, für Listenanzeige (z. B. „ArbSchG §3 Abs. 1")</td></tr>
+<tr><td><code>gesetz</code></td><td>Text</td><td>Gesetzeskurzform bei Typ „gesetz" (z. B. „EStG", „ArbSchG")</td></tr>
+<tr><td><code>paragraph</code></td><td>Text</td><td>Paragraph + Absatz bei Typ „gesetz" (z. B. „§3 Abs. 1")</td></tr>
+<tr><td><code>aktenzeichen</code></td><td>Text</td><td>BFH-Aktenzeichen bei Typ „urteil" (z. B. „VI R 42/22")</td></tr>
+<tr><td><code>schreiben_nummer</code></td><td>Text</td><td>BMF-Schreiben-Nr. bei Typ „schreiben"</td></tr>
+<tr><td><code>volltext</code></td><td>Text</td><td>Vollständiger Normtext / Urteil / Schreiben-Inhalt</td></tr>
+<tr><td><code>kurztext</code></td><td>Text</td><td>Erste 200 Zeichen des Volltextes für Listenanzeige</td></tr>
+<tr><td><code>quelle_url</code></td><td>Text</td><td>Ursprungs-URL (gesetze-im-internet.de, BFH-Datenbank, BMF)</td></tr>
+<tr><td><code>datum</code></td><td>Date</td><td>Fassungsstand (Gesetz) bzw. Urteils-/Schreiben-Datum</td></tr>
+<tr><td><code>externe_id</code></td><td>Text UNIQUE</td><td>Idempotenz-Schlüssel: <code>&lt;quelle&gt;:&lt;identifier&gt;</code> — verhindert Duplikate bei mehrfachem Import</td></tr>
+<tr><td><code>embedding</code></td><td>vector(1536)</td><td>pgvector-Embedding des Volltextes für semantische Suche im Zitier-Guard</td></tr>
+<tr><td><code>importiert_am</code></td><td>DateTime</td><td>Zeitpunkt des ersten Imports</td></tr>
+<tr><td><code>aktualisiert_am</code></td><td>DateTime</td><td>Zeitpunkt des letzten Updates</td></tr>
+</table>
+
+<h2>3. Import-Prozess</h2>
+
+<h3>Drei Quellen, drei Importer</h3>
+
+<ul>
+<li><b>Gesetze im Internet</b> — <code>gesetze-im-internet.de</code> stellt einen XML-Feed bereit. Importer holt Gesetzestexte, zerlegt sie in Paragraphen, schreibt je Absatz einen Datensatz.</li>
+<li><b>BFH-Datenbank</b> — Bundesfinanzhof veröffentlicht Urteile mit Aktenzeichen. Scrape/RSS-Feed liefert Titel, Datum, Volltext.</li>
+<li><b>BMF-Schreiben</b> — Bundesfinanzministerium-Newsletter/Archiv mit Verwaltungsvorschriften.</li>
+</ul>
+
+<h3>Idempotenz</h3>
+
+<p>Der <code>externe_id</code>-Schlüssel setzt sich zusammen als <code>&lt;quelle&gt;:&lt;identifier&gt;</code>:</p>
+<pre>gesetze-im-internet:arbschg-para3-abs1
+bfh:VI-R-42-22
+bmf:2024-IV-C-1-S-1234</pre>
+<p>Mehrfach-Aufruf des Importers erzeugt keine Duplikate. Bei Änderungen der Fassung wird der Datensatz aktualisiert (neue <code>aktualisiert_am</code>-Zeit).</p>
+
+<h3>Endpoint</h3>
+<pre>POST /api/v1/rechtsquellen/import
+Body: { "quelle": "gesetze-im-internet" | "bfh" | "bmf" }
+Response: {
+  "neu":           N,   ← Anzahl neuer Datensätze
+  "aktualisiert":  N,   ← Anzahl geänderter Datensätze
+  "uebersprungen": N,   ← unverändert (Idempotenz-Treffer)
+  "fehler":        [ … ]
+}</pre>
+
+<h2>4. Zitier-Guard</h2>
+
+<p>Der Zitier-Guard läuft in der Seminar-Generierungs-Pipeline (Sprint 2b). Ablauf:</p>
+
+<ol>
+<li>Die Content-KI erhält ein Seminar-Thema und generiert einen ersten Entwurf.</li>
+<li><b>Vor</b> der Übergabe an die Didaktik-KI: Rechtsquellen-DB wird nach semantisch passenden Chunks abgefragt (pgvector-Nearest-Neighbor).</li>
+<li>Die Treffer-IDs werden dem Prompt der Didaktik-KI als „erlaubte Quellen" mitgegeben, zusammen mit strikter Regel:</li>
+</ol>
+
+<div class="box">
+<h3>Zitier-Guard-Prompt-Fragment</h3>
+<pre>Erlaubte Rechtsquellen (mit ID):
+  [Liste aus DB-Treffern]
+
+REGEL: Zitiere Aktenzeichen, Paragraphen oder BMF-Schreiben-
+Nummern AUSSCHLIESSLICH, wenn die entsprechende ID in obiger
+Liste steht. Ohne passenden DB-Treffer schreib stattdessen
+„Quelle offen" — auch wenn du meinst, das Aktenzeichen zu
+kennen. Frei erfundene Zitate sind untersagt.</pre>
+</div>
+
+<p>So kommen ins Skript nur Zitate, die tatsächlich verifiziert sind. Alles andere wird bewusst als offen markiert und kann von einem Menschen nachrecherchiert werden.</p>
+
+<h2>5. API-Endpoints (Sprint 3b)</h2>
+
+<pre>GET  /api/v1/rechtsquellen?typ=gesetz|urteil|schreiben&q=…&limit=50&offset=0
+     → Liste (paginierbar, Filter, Volltext-Suche)
+
+GET  /api/v1/rechtsquellen/{id}
+     → Detail mit volltext
+
+POST /api/v1/rechtsquellen/import
+     → Trigger für Importer (siehe oben)</pre>
+
+<h2>6. Update-Prozess</h2>
+
+<p>Die Rechtsquellen ändern sich (neue Gesetze, neue Urteile, geänderte Fassungen). Zwei Strategien:</p>
+
+<ul>
+<li><b>Manueller Trigger</b>: Admin ruft <code>POST /api/v1/rechtsquellen/import</code> nach Bedarf.</li>
+<li><b>Scheduled Task</b>: Nachts läuft der Importer automatisch für alle drei Quellen (Sprint 3c/3d).</li>
+</ul>
+
+<p>Bei jedem Update-Lauf werden geänderte Datensätze markiert (<code>aktualisiert_am</code>). Themen-Chunks, die auf veraltete Rechtsquellen verweisen, bekommen im Frontend einen Warnbadge („Gesetzeslage geändert seit …") — siehe Etappe 3c.</p>
+
+<h2>7. Sicherheits- und Rechtsaspekte</h2>
+
+<ul>
+<li>Rechtsquellen werden aus offiziellen, öffentlich verfügbaren Quellen importiert. Keine Urheberrechts-Verletzung, aber Quelle immer transparent im UI (Original-Link).</li>
+<li>Der Zitier-Guard ist kein Ersatz für juristische Endprüfung. Das Seminar-Skript bleibt eine Vorlage, die von einem Fachmenschen freigegeben wird.</li>
+<li>Bei DSGVO-Anfragen (Betroffenenrechte) sind Rechtsquellen unkritisch — sie enthalten keine personenbezogenen Daten (BFH-Urteile pseudonymisiert).</li>
+</ul>
+
+<footer>
+ScriptNext · Rechtsquellen-Schema · Stand 27.09.2026 · Docky · Ergänzung zu Sprint 2b (KI-Pipeline) und Sprint 3b (Import + Zitier-Guard scharfschalten).
+</footer>
+
+<div class="chevron">&gt;</div>
+
+</body>
+</html>
