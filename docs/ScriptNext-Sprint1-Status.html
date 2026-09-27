@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>ScriptNext Sprint 1 — Status</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;600;700&family=JetBrains+Mono&display=swap');
+  :root {
+    --navy: #0B2545;
+    --lime: #A3E635;
+    --ink: #15191F;
+    --paper: #F8FAFC;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 48px 32px 120px;
+    line-height: 1.6;
+    position: relative;
+    min-height: 100vh;
+  }
+  header {
+    border-bottom: 3px solid var(--navy);
+    padding-bottom: 24px;
+    margin-bottom: 40px;
+  }
+  .overline {
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 13px;
+    letter-spacing: 0.15em;
+    color: #4D7C0F;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  h1 {
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 44px;
+    line-height: 1.1;
+    color: var(--navy);
+    margin: 0 0 8px;
+  }
+  .subtitle {
+    font-size: 18px;
+    color: var(--navy);
+    opacity: 0.72;
+  }
+  h2 {
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 22px;
+    color: var(--navy);
+    margin-top: 40px;
+    margin-bottom: 12px;
+    border-left: 4px solid var(--lime);
+    padding-left: 12px;
+  }
+  h3 {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--navy);
+    margin-top: 20px;
+    margin-bottom: 6px;
+  }
+  ul, ol { padding-left: 22px; }
+  li { margin-bottom: 6px; }
+  p { margin: 8px 0 12px; }
+  .badge {
+    display: inline-block;
+    background: var(--lime);
+    color: var(--navy);
+    padding: 3px 10px;
+    border-radius: 3px;
+    font-size: 12px;
+    font-family: 'Archivo Black', sans-serif;
+    letter-spacing: 0.08em;
+    margin-right: 6px;
+  }
+  .badge-live {
+    background: #16A34A;
+    color: white;
+  }
+  .badge-wip {
+    background: #F59E0B;
+    color: white;
+  }
+  .badge-todo {
+    background: #94A3B8;
+    color: white;
+  }
+  .box {
+    background: white;
+    border: 1px solid #E2E8F0;
+    border-left: 4px solid var(--navy);
+    padding: 16px 20px;
+    margin: 16px 0;
+    border-radius: 3px;
+  }
+  .box.live {
+    border-left-color: #16A34A;
+    background: #F0FDF4;
+  }
+  .box.live h3 { color: #14532D; margin-top: 0; }
+  .box.wip {
+    border-left-color: #F59E0B;
+    background: #FFFBEB;
+  }
+  .box.wip h3 { color: #78350F; margin-top: 0; }
+  code {
+    background: #E2E8F0;
+    padding: 2px 6px;
+    border-radius: 2px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+  }
+  a {
+    color: var(--navy);
+    text-decoration: underline;
+    word-break: break-all;
+  }
+  footer {
+    margin-top: 60px;
+    padding-top: 20px;
+    border-top: 1px solid #CBD5E1;
+    font-size: 12px;
+    color: var(--ink);
+    opacity: 0.6;
+  }
+  .chevron {
+    position: fixed;
+    right: 24px;
+    bottom: 20px;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    font-size: 44px;
+    color: var(--lime);
+    opacity: 0.9;
+    pointer-events: none;
+    line-height: 1;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0;
+  }
+  th, td {
+    text-align: left;
+    padding: 8px 12px;
+    border-bottom: 1px solid #CBD5E1;
+    vertical-align: top;
+  }
+  th {
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 13px;
+    color: var(--navy);
+    letter-spacing: 0.05em;
+  }
+  @media (max-width: 640px) {
+    body { padding: 24px 16px 100px; }
+    h1 { font-size: 32px; }
+    h2 { font-size: 18px; }
+    .chevron { font-size: 32px; right: 12px; bottom: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="overline">Sprint-1-Status · Stand 26.09.2026 · 09:11 · Docky</div>
+  <h1>ScriptNext Sprint 1 <span class="badge badge-live" style="vertical-align:middle;">ABGESCHLOSSEN</span></h1>
+  <div class="subtitle">Backend + Frontend live · MVP-Preview für catrin bereit</div>
+</header>
+
+<h2>1. Preview-URLs (live)</h2>
+
+<div class="box live">
+<h3><span class="badge badge-live">LIVE</span> Frontend</h3>
+<p><a href="https://e1624faf90b9cb07.preview.w1009.pandora.cl01.efiniti.de/preview/wl0whd9a/scriptnext-frontend/">https://e1624faf90b9cb07.preview.w1009.pandora.cl01.efiniti.de/preview/wl0whd9a/scriptnext-frontend/</a></p>
+<ul>
+<li><b>Screens:</b> Login (/) · Upload (/upload) · Themen (/themen)</li>
+<li><b>Stack:</b> Next.js 14 + TypeScript + Tailwind, BSt-Next-CI (Navy #0B2545, Lime #A3E635, Chevron)</li>
+<li><b>Betrieb:</b> Dev-Server (<code>npm run dev</code>, node:20-slim) — kein Prod-Build</li>
+</ul>
+</div>
+
+<div class="box live">
+<h3><span class="badge badge-live">LIVE</span> Backend</h3>
+<ul>
+<li><b>API-Basis:</b> <a href="https://e1624faf90b9cb07.preview.w1009.pandora.cl01.efiniti.de/preview/wl0whd9a/scriptnext-backend/">.../scriptnext-backend/</a></li>
+<li><b>Swagger-UI:</b> <a href="https://e1624faf90b9cb07.preview.w1009.pandora.cl01.efiniti.de/preview/wl0whd9a/scriptnext-backend/docs">.../scriptnext-backend/docs</a></li>
+<li><b>Health-Check:</b> <a href="https://e1624faf90b9cb07.preview.w1009.pandora.cl01.efiniti.de/preview/wl0whd9a/scriptnext-backend/health">.../scriptnext-backend/health</a></li>
+<li><b>Deployment:</b> Sorty (Commit <code>33df78c</code>, 9/9 Unit-Tests grün)</li>
+</ul>
+<p><b>Funktioniert:</b> Login (JWT), PDF-Upload (async), Text-Extraktion, Chunking, heuristische Themen-Erkennung, CRUD auf Themen, Merge-Endpunkt.</p>
+<p><b>Deaktiviert im MVP:</b> pgvector-Embeddings (das verwendete Docker-Image <code>postgres:16-alpine</code> hat keine pgvector-Extension). Kommt in Sprint 2 mit passendem Image.</p>
+</div>
+
+<h2>3. API-Contract Sprint 1</h2>
+
+<table>
+<tr><th>Endpunkt</th><th>Zweck</th><th>Status</th></tr>
+<tr><td><code>POST /api/v1/auth/login</code></td><td>JWT-Login (Benutzername + Passwort)</td><td><span class="badge badge-live">LIVE</span></td></tr>
+<tr><td><code>POST /api/v1/upload</code></td><td>PDF-Upload (async, 202)</td><td><span class="badge badge-live">LIVE</span></td></tr>
+<tr><td><code>GET /api/v1/dokumente/{id}</code></td><td>Upload-Status-Polling</td><td><span class="badge badge-live">LIVE</span></td></tr>
+<tr><td><code>GET /api/v1/themen</code></td><td>Themen-Liste (paginierbar)</td><td><span class="badge badge-live">LIVE</span></td></tr>
+<tr><td><code>PATCH /api/v1/themen/{id}</code></td><td>Thema umbenennen/bearbeiten</td><td><span class="badge badge-live">LIVE</span></td></tr>
+<tr><td><code>DELETE /api/v1/themen/{id}</code></td><td>Thema löschen</td><td><span class="badge badge-live">LIVE</span></td></tr>
+<tr><td><code>POST /api/v1/themen/merge</code></td><td>Themen zusammenführen</td><td><span class="badge badge-live">LIVE</span></td></tr>
+</table>
+
+<p><b>Mandantenfähigkeit:</b> JWT-Claim <code>tenant_id</code> filtert alle Abfragen serverseitig; 403 als Sicherheitsnetz bei Cross-Tenant-Zugriffen.</p>
+
+<h2>4. Team</h2>
+
+<ul>
+<li><b>Sorty</b> — Backend (FastAPI + PostgreSQL + Ingest-Pipeline)</li>
+<li><b>Weby</b> — Frontend (Next.js + BSt-Next-CI)</li>
+<li><b>Docky</b> — Koordination + Doku</li>
+<li><b>Irony</b> — Entscheider bei Uneinigkeit (catrin-Direktive)</li>
+<li><b>catrin</b> — Product-Owner, Freigabe</li>
+</ul>
+
+<h2>5. Offene Punkte Sprint 2</h2>
+
+<ol>
+<li><b>pgvector-Embeddings aktivieren:</b> Postgres-Image auf <code>ankane/pgvector</code> o. ä. umstellen, dann echte semantische Suche</li>
+<li><b>KI-Clustering für Themen-Erkennung</b> statt der aktuellen Heuristik</li>
+<li><b>Themen-Split-Endpoint</b> (im MVP bewusst weggelassen — Löschen + Neu reicht in Sprint 1)</li>
+<li><b>Zwei-Stufen-KI-Pipeline</b> (Content-KI + Didaktik-KI) für Skript-Generierung</li>
+<li><b>Verifizierte Rechtsquellen-DB</b> gegen KI-Halluzinationen bei Paragrafen/Aktenzeichen</li>
+<li><b>httpOnly-Cookie-Umstellung</b> für JWT (aktuell <code>localStorage</code> — Dev-Only)</li>
+<li><b>Admin-Passwort rotieren</b>: MVP-Passwort steht im Chat-Log und muss vor Prod ersetzt werden</li>
+<li><b>CORS einschränken</b> vor Produktivstart</li>
+<li><b>Feedback-Schleife</b> nach jedem Seminar</li>
+<li><b>Themen-Versionierung</b> bei Gesetzesänderungen</li>
+<li><b>SharePoint-Andockung</b> für den späteren Standalone-Verkauf</li>
+</ol>
+
+<h2>6. Sicherheits-Hinweise</h2>
+
+<div class="box">
+<h3>Dev-Only-Setup</h3>
+<ul>
+<li>Admin-Passwort ist im Chat-Log dokumentiert — muss vor Produktivstart durch ein anderes, nicht im Chat verwendetes Passwort ersetzt werden.</li>
+<li>Auth-Token liegt im MVP im <code>localStorage</code>. Sprint 2: Umstellung auf httpOnly-Cookie analog SSO-Muster der anderen BSt-Next-Apps.</li>
+<li>CORS ist im MVP offen — Prod-Deploy muss die zulässigen Origins auf die produktive Frontend-Domain einschränken.</li>
+</ul>
+</div>
+
+<footer>
+ScriptNext · Sprint-1-Statusblatt · Stand 26.09.2026 · Docky · Konzept-Blatt: <code>ScriptNext-Konzept.html</code> · Freigabe zum Deploy durch catrin.
+</footer>
+
+<div class="chevron">&gt;</div>
+
+</body>
+</html>

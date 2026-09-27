@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>ScriptNext — Konzept</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;600;700&family=JetBrains+Mono&display=swap');
+  :root {
+    --navy: #0B2545;
+    --lime: #A3E635;
+    --ink: #15191F;
+    --paper: #F8FAFC;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 48px 32px 120px;
+    line-height: 1.6;
+    position: relative;
+    min-height: 100vh;
+  }
+  header {
+    border-bottom: 3px solid var(--navy);
+    padding-bottom: 24px;
+    margin-bottom: 40px;
+  }
+  .overline {
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 13px;
+    letter-spacing: 0.15em;
+    color: #4D7C0F;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  h1 {
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 44px;
+    line-height: 1.1;
+    color: var(--navy);
+    margin: 0 0 8px;
+  }
+  .subtitle {
+    font-size: 18px;
+    color: var(--navy);
+    opacity: 0.72;
+  }
+  h2 {
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 22px;
+    color: var(--navy);
+    margin-top: 40px;
+    margin-bottom: 12px;
+    border-left: 4px solid var(--lime);
+    padding-left: 12px;
+  }
+  h3 {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--navy);
+    margin-top: 20px;
+    margin-bottom: 6px;
+  }
+  ul, ol { padding-left: 22px; }
+  li { margin-bottom: 6px; }
+  p { margin: 8px 0 12px; }
+  .badge {
+    display: inline-block;
+    background: var(--lime);
+    color: var(--navy);
+    padding: 3px 10px;
+    border-radius: 3px;
+    font-size: 12px;
+    font-family: 'Archivo Black', sans-serif;
+    letter-spacing: 0.08em;
+    margin-right: 6px;
+  }
+  .box {
+    background: white;
+    border: 1px solid #E2E8F0;
+    border-left: 4px solid var(--navy);
+    padding: 16px 20px;
+    margin: 16px 0;
+    border-radius: 3px;
+  }
+  .box.warn {
+    border-left-color: #DC2626;
+    background: #FEF2F2;
+  }
+  .box.warn h3 { color: #7F1D1D; margin-top: 0; }
+  code {
+    background: #E2E8F0;
+    padding: 2px 6px;
+    border-radius: 2px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+  }
+  footer {
+    margin-top: 60px;
+    padding-top: 20px;
+    border-top: 1px solid #CBD5E1;
+    font-size: 12px;
+    color: var(--ink);
+    opacity: 0.6;
+  }
+  .chevron {
+    position: fixed;
+    right: 24px;
+    bottom: 20px;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    font-size: 44px;
+    color: var(--lime);
+    opacity: 0.9;
+    pointer-events: none;
+    line-height: 1;
+  }
+  @media (max-width: 640px) {
+    body { padding: 24px 16px 100px; }
+    h1 { font-size: 32px; }
+    h2 { font-size: 18px; }
+    .chevron { font-size: 32px; right: 12px; bottom: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="overline">Konzept-Blatt · Stand 25.09.2026 · Docky</div>
+  <h1>ScriptNext</h1>
+  <div class="subtitle">KI-gestütztes Seminar-Skript-Werkzeug — vom PDF-Fundus zum angepassten Vortrag</div>
+</header>
+
+<h2>1. Ziel</h2>
+<p>Aus vorhandenen Skript-PDFs (Fach- und Prozess-Themen) automatisch <b>maßgeschneiderte Seminare</b> generieren: Skript, Präsentation und Handout auf Basis der eingegebenen W-Fragen (Wann, Wo, Wer, Was, Wie lange). Die Inhalte werden aus einer eigenen Wissensdatenbank gezogen und für jedes Seminar neu formuliert — kein 1:1-Kopieren.</p>
+
+<h2>2. Nutzer</h2>
+<ul>
+<li><b>Primär:</b> Beratungsstellen auf unterschiedlichen Niveaus (Anfänger, Fortgeschrittene, IT-Laien, junge Interessierte)</li>
+<li><b>Themenspektrum:</b> Prozess/Effizienz (Steuersoftware-Nutzung, Arbeitsabläufe in der Beratungsstelle) und Fachthemen (Geldwäsche, Datenschutz, Gesetzesänderungen, Steuerrecht)</li>
+<li><b>Perspektive:</b> Später als eigenständiges Produkt an weitere Zielgruppen vermarktbar</li>
+</ul>
+
+<h2>3. Etappen</h2>
+
+<h3><span class="badge">E1</span> Wissensaufbau</h3>
+<p>PDF-Upload → Text-Extraktion (inkl. OCR bei Scans) → KI-Chunking in Themen-Häppchen → Speicherung in Vektor-Datenbank mit semantischer Suche. Jedes Chunk erhält ein Aufnahme-Datum zur späteren Versionierung.</p>
+
+<h3><span class="badge">E2</span> Themen-Redaktion</h3>
+<p>Übersichts-UI aller erkannten Themen. Manuelle Zusammenführung/Trennung/Löschung möglich (KI-Klassifikation ist nie 100 %).</p>
+
+<h3><span class="badge">E3</span> Seminar-Generator (W-Fragen-Formular)</h3>
+<ul>
+<li><b>Wann?</b> — Datum</li>
+<li><b>Wo?</b> — Ort / Format (vor Ort, online, hybrid)</li>
+<li><b>Wer?</b> — Zielgruppe &amp; Vorwissen (definiert Sprachniveau)</li>
+<li><b>Was?</b> — Themenauswahl aus dem Pool (Mehrfachauswahl)</li>
+<li><b>Wie lange?</b> — Dauer / Tiefe (45-Min-Vortrag vs. Tages-Workshop)</li>
+</ul>
+
+<h3><span class="badge">E4</span> Zwei-Stufen-KI-Pipeline</h3>
+<ul>
+<li><b>Stufe 1 — Content-KI:</b> stellt die Themen-Chunks passend zusammen, formuliert neu</li>
+<li><b>Stufe 2 — Didaktik-KI:</b> überarbeitet auf Zielgruppen-Sprachniveau, baut roten Faden, Beispiele, Übungen, Zwischenfragen ein</li>
+</ul>
+
+<h3><span class="badge">E5</span> Ausgabe &amp; Freigabe</h3>
+<ul>
+<li>Word-Skript, PowerPoint-Präsentation, Teilnehmer-Handout — alle im BSt-Next-Layout (CI-Templates)</li>
+<li>Vorschau/Review-Schritt vor dem Export: Absätze verwerfen oder umformulieren</li>
+</ul>
+
+<h3><span class="badge">E6</span> SharePoint-Anbindung</h3>
+<p>Endgültige Plattform: Tool läuft in/an SharePoint. Weichenstellung siehe Abschnitt 6.</p>
+
+<h2>4. Kritischer Baustein: Verifizierte Rechtsquellen</h2>
+
+<div class="box warn">
+<h3>Warum eigener Baustein?</h3>
+<p>LLMs erfinden Aktenzeichen, Paragraphen und BMF-Schreiben mit hoher Plausibilität („BFH-Urteil vom 12.03.2023, VI R 42/22" — klingt echt, kann frei erfunden sein). Wenn solche Verweise im Seminar zitiert werden und nicht existieren, ist das <b>rechtlich heikel</b> und rufschädigend.</p>
+<p><b>Lösung:</b> Verweise auf Gesetzestexte, Urteile und BMF-Schreiben dürfen NICHT frei aus dem KI-Gedächtnis kommen, sondern nur aus einer <b>verifizierten Quellendatenbank</b> (Gesetze im Internet, BFH-Datenbank, BMF-Schreiben-Archiv). Die KI erhält im Prompt strikte Anweisung: „Zitiere nur, was in der Quellendatenbank verifiziert wurde."</p>
+</div>
+
+<h2>5. Zusätzliche Wissensquellen</h2>
+<ul>
+<li><b>PDFs</b> (ca. 50 Skripte à 100 Seiten = ~5.000 Seiten zum Start)</li>
+<li><b>ShareNext-Radar-Stream</b> — kontinuierlicher Feed aktueller Steuer-News, wird automatisch in die Wissensdatenbank eingespeist</li>
+<li><b>Verifizierte Rechtsquellen-DB</b> (siehe Punkt 4)</li>
+</ul>
+
+<h2>6. Weichenstellungen</h2>
+
+<h3>KI-Provider</h3>
+<p><b>Anthropic (Cloud)</b> für die anspruchsvolle Zusammenstellung + Didaktik-Optimierung. <b>Lokales Qwen</b> als Option für sensible/wiederholbare Aufgaben (analog SortNext). Entscheidung pro Aufgabe.</p>
+
+<h3>SharePoint-Wahl</h3>
+<ul>
+<li><b>Option A</b> — Microsoft Copilot Studio / Power App: schnellster Weg im M365-Ökosystem, aber gebunden an Microsoft-Lizenzen</li>
+<li><b>Option B</b> — Eigenständige Web-App mit SharePoint-Andockung: mehr Freiheit, notwendig für Standalone-Verkauf später</li>
+</ul>
+<p><b>Empfehlung: Option B</b>, weil Standalone-Verkauf geplant. Mandantenfähige Architektur von Anfang an — keine BSt-Next-Spezifika im Code, mehrere Kunden mit getrennten Wissensdatenbanken möglich.</p>
+
+<h2>7. Team</h2>
+<ul>
+<li><b>1 Backend-Agent (neu):</b> RAG-Pipeline, Vektor-DB, KI-Aufrufe, Rechtsquellen-DB, Word-/PowerPoint-Export</li>
+<li><b>1 Frontend-Agent (neu):</b> Upload-UI, Themen-Redaktion, W-Fragen-Formular, Vorschau/Review, SharePoint-Anbindung</li>
+<li><b>Docky:</b> Konzept, CI-Templates für Word/PPT, Doku, Bindeglied</li>
+<li><b>Irony:</b> Datenschutz-/Rechts-Rückfragen, sobald verfügbar</li>
+<li><b>catrin:</b> Produktverantwortung, Fach-Input, Themen-Beispiele, Freigaben</li>
+</ul>
+
+<h2>8. Feedback-Schleife (Sprint 2)</h2>
+<p>Nach jedem Seminar Rückmeldung im Tool erfassen („gut geklappt / zu langweilig / falsche Ebene"). Die KI lernt über die Zeit, was für welche Zielgruppe funktioniert.</p>
+
+<h2>9. Themen-Versionierung</h2>
+<p>Wenn ein Gesetz sich ändert, betrifft das alle Chunks daraus. Warnhinweis im UI bei veralteten Chunks („zuletzt bezogen aus: Skript vom 12.03.2024 — Rechtslage geändert seit 01.07.2026").</p>
+
+<h2>10. Nächste Schritte</h2>
+<ol>
+<li>Konzept-Freigabe durch catrin</li>
+<li>2 dedizierte Agents anlegen (Backend + Frontend)</li>
+<li><b>Sprint 1:</b> E1 + E2 + E3 (Wissensaufbau, Themen-Redaktion, W-Fragen-Formular) — MVP mit Anthropic-Cloud, ohne Rechtsquellen-DB</li>
+<li><b>Sprint 2:</b> E4 + E5 + verifizierte Rechtsquellen-DB + CI-Templates</li>
+<li><b>Sprint 3:</b> SharePoint-Anbindung + Mandantenfähigkeit</li>
+</ol>
+
+<footer>
+ScriptNext · Konzept-Blatt v0.1 · Stand 25.09.2026 · zusammengestellt von Docky auf Basis der Konzept-Diskussion mit catrin im ScriptNext-Raum. Änderungen laufend, Freigabe durch catrin steht aus.
+</footer>
+
+<div class="chevron">&gt;</div>
+
+</body>
+</html>

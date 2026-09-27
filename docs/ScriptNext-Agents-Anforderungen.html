@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>ScriptNext — Anforderungen an die Agents</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;600;700&family=JetBrains+Mono&display=swap');
+  :root { --navy:#0B2545; --lime:#A3E635; --ink:#15191F; --paper:#F8FAFC; --line:#CBD5E1; }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{font-family:'Inter',system-ui,sans-serif;background:var(--paper);color:var(--ink);max-width:960px;margin:0 auto;padding:48px 32px 120px;line-height:1.6;min-height:100vh}
+  header{border-bottom:3px solid var(--navy);padding-bottom:24px;margin-bottom:40px}
+  .overline{font-family:'Archivo Black',sans-serif;font-size:13px;letter-spacing:.15em;color:#4D7C0F;text-transform:uppercase;margin-bottom:8px}
+  h1{font-family:'Archivo Black',sans-serif;font-size:42px;line-height:1.1;color:var(--navy);margin:0 0 8px}
+  .subtitle{font-size:18px;color:var(--navy);opacity:.72}
+  h2{font-family:'Archivo Black',sans-serif;font-size:22px;color:var(--navy);margin-top:40px;margin-bottom:12px;border-left:4px solid var(--lime);padding-left:12px}
+  h3{font-family:'Inter',sans-serif;font-weight:700;font-size:16px;color:var(--navy);margin-top:20px;margin-bottom:6px}
+  ul,ol{padding-left:22px}li{margin-bottom:6px}
+  p{margin:8px 0 12px}
+  .card{background:white;border:1px solid #E2E8F0;border-top:6px solid var(--lime);padding:24px 28px;margin:24px 0;border-radius:4px;box-shadow:0 1px 3px rgba(11,37,69,.05)}
+  .card h2{margin-top:0;border-left:none;padding-left:0;color:var(--navy);display:flex;align-items:baseline;gap:12px}
+  .card .name{font-family:'Archivo Black',sans-serif;font-size:28px}
+  .card .kind{font-family:'JetBrains Mono',monospace;font-size:13px;color:#4D7C0F;letter-spacing:.05em}
+  code{background:#E2E8F0;padding:2px 6px;border-radius:2px;font-family:'JetBrains Mono',monospace;font-size:13px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:12px 0}
+  .stack{background:#F1F5F9;padding:10px 14px;border-radius:3px;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.5}
+  .stack b{font-family:'Inter',sans-serif;font-weight:700;color:var(--navy);display:block;margin-bottom:2px}
+  footer{margin-top:60px;padding-top:20px;border-top:1px solid var(--line);font-size:12px;color:var(--ink);opacity:.6}
+  .chevron{position:fixed;right:24px;bottom:20px;font-family:'JetBrains Mono',monospace;font-weight:700;font-size:44px;color:var(--lime);opacity:.9;pointer-events:none;line-height:1}
+  @media(max-width:640px){body{padding:24px 16px 100px}h1{font-size:30px}.grid2{grid-template-columns:1fr}.chevron{font-size:32px;right:12px;bottom:12px}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="overline">Agent-Anforderungen · Stand 25.09.2026 · Docky</div>
+  <h1>ScriptNext — die beiden Agents</h1>
+  <div class="subtitle">Blaupausen für den Backend- und den Frontend-Agenten. Bezug: <b>ScriptNext-Konzept.html</b>.</div>
+</header>
+
+<h2>Namensvorschlag &amp; Rollen-Trennung</h2>
+<ul>
+<li><b>Ragy</b> — Backend-Agent, verantwortlich für RAG-Pipeline, KI-Aufrufe, Datenbanken, Datei-Exporte.</li>
+<li><b>Formy</b> — Frontend-Agent, verantwortlich für Nutzeroberfläche, W-Fragen-Formular, SharePoint-Anbindung.</li>
+</ul>
+<p>Namen sind Vorschläge im -y-Muster (Weby, Sorty, Docky). Falls dir andere lieber sind: einfach umbenennen, die Rollen bleiben identisch.</p>
+
+<!-- ============ RAGY ============ -->
+<div class="card">
+<h2><span class="name">Ragy</span> <span class="kind">Backend-Agent</span></h2>
+
+<h3>Mission</h3>
+<p>Baut die technische Grundlage von ScriptNext: Wissensdatenbank aus Skripten aufbauen, KI-Anfragen orchestrieren, Word- und PowerPoint-Dateien ausliefern.</p>
+
+<h3>Zuständigkeit (Reihenfolge = Bau-Prioritätent)</h3>
+<ol>
+<li><b>PDF-Ingest</b>: Upload-Endpunkt, Text-Extraktion (native PDFs + OCR bei Scans).</li>
+<li><b>Chunking</b>: semantische Zerlegung in Themen-Häppchen mit Overlap; Metadaten (Quelle, Aufnahme-Datum, Themen-Tags).</li>
+<li><b>Vektor-DB</b>: Speicherung + semantische Suche. Empfehlung <code>pgvector</code> (SQL-Basis, einfach zu betreiben).</li>
+<li><b>LLM-Adapter</b>: Anthropic Claude (Cloud) als Standard, lokales Qwen als optionaler zweiter Provider.</li>
+<li><b>Zwei-Stufen-Pipeline</b>: (a) Content-KI stellt zusammen, (b) Didaktik-KI überarbeitet — als sequentielle Kette mit Zwischen-Cache.</li>
+<li><b>Rechtsquellen-Adapter</b>: Anbindung an Gesetze-im-Internet-API, BFH-Rechtsprechung, BMF-Schreiben. Verifizierungs-Layer, der Halluzinationen abfängt (siehe Konzept §4).</li>
+<li><b>Export</b>: Word (<code>python-docx</code>), PowerPoint (<code>python-pptx</code>) — mit CI-Templates von Docky.</li>
+<li><b>Mandantenfähigkeit</b>: Datenbank-Tennant-Schlüssel auf jeder Tabelle; kein globaler Zugriff.</li>
+<li><b>Feedback-API</b>: Endpunkte für Seminar-Bewertung (später Sprint 2).</li>
+</ol>
+
+<h3>Technischer Stack (Vorschlag, catrin/Ragy können anpassen)</h3>
+<div class="grid2">
+<div class="stack"><b>Sprache</b>Python 3.12 (analog SortNext)</div>
+<div class="stack"><b>Web-Framework</b>Flask oder FastAPI</div>
+<div class="stack"><b>Vektor-DB</b>pgvector (PostgreSQL-Extension)</div>
+<div class="stack"><b>PDF-Extraktion</b>pdfplumber + pytesseract (OCR)</div>
+<div class="stack"><b>KI-Client</b>Anthropic SDK + optional Ollama/Qwen</div>
+<div class="stack"><b>Export</b>python-docx, python-pptx</div>
+</div>
+
+<h3>Schnittstellen</h3>
+<ul>
+<li><b>REST/JSON-API</b> für Formy: <code>POST /api/ingest</code>, <code>GET /api/themen</code>, <code>POST /api/themen/redigieren</code>, <code>POST /api/seminar/generieren</code>, <code>GET /api/seminar/&lt;id&gt;/word</code>, <code>GET /api/seminar/&lt;id&gt;/pptx</code>.</li>
+<li><b>OpenAPI-Spec</b> als lebendige Doku (Swagger UI).</li>
+<li><b>Auth</b>: Portal-SSO-Cookie (analog SortNext/BookNext), Kontrolle über Docky bei Anbindung.</li>
+</ul>
+
+<h3>Persona &amp; Regeln</h3>
+<ul>
+<li>Sprache Deutsch (EU), echte Umlaute, per Du mit catrin.</li>
+<li>Ehrliche Grenzen benennen, keine erfundenen Aktenzeichen oder Halluzinationen zulassen.</li>
+<li>Tag-Regel: <b>neuer Tag NUR nach catrins „deployed"-Meldung</b>.</li>
+<li>Keine Klartext-Secrets in Chat, Log, Code.</li>
+</ul>
+
+<h3>Deliverable-Reihenfolge</h3>
+<ol>
+<li>Sprint 1: Ingest + Chunking + Vektor-DB + einfache Suche (MVP zum Vorführen).</li>
+<li>Sprint 2: LLM-Pipeline + Word-/PPT-Export mit Docky-Templates.</li>
+<li>Sprint 3: Rechtsquellen-DB + Mandantenfähigkeit + Feedback-API.</li>
+</ol>
+</div>
+
+<!-- ============ FORMY ============ -->
+<div class="card">
+<h2><span class="name">Formy</span> <span class="kind">Frontend-Agent</span></h2>
+
+<h3>Mission</h3>
+<p>Baut das Nutzererlebnis von ScriptNext: PDF hochladen, Themen redigieren, W-Fragen ausfüllen, Ergebnis prüfen, exportieren — alles CI-treu und barrierefrei.</p>
+
+<h3>Zuständigkeit (Reihenfolge)</h3>
+<ol>
+<li><b>Upload-UI</b>: Drag &amp; Drop-Bereich, Fortschrittsanzeige, Fehlermeldungen bei Scan-OCR-Problemen.</li>
+<li><b>Themen-Redaktion</b>: Tabelle aller erkannten Themen, Volltextsuche, Merge/Split/Delete, Aufnahme-Datum sichtbar, Warnhinweis bei veralteten Chunks (Konzept §9).</li>
+<li><b>W-Fragen-Formular</b>: 5 Felder (Wann/Wo/Wer/Was/Wie lange), Themen-Mehrfachauswahl, Sprachniveau-Regler.</li>
+<li><b>Vorschau/Review</b>: Absatzweise Anzeige mit „behalten"/„verwerfen"/„umformulieren"-Buttons vor dem Export.</li>
+<li><b>Export-Panel</b>: Buttons für Word-Skript, PowerPoint, Teilnehmer-Handout.</li>
+<li><b>Feedback-Panel</b>: Kurze Bewertung nach dem Seminar (Sprint 2).</li>
+<li><b>SharePoint-Integration</b>: Login via SSO, Ordner-Auswahl für den Export, „In SharePoint speichern"-Button.</li>
+<li><b>Admin-Bereich</b>: Mandanten, Nutzerrollen, Wissensdatenbank-Management.</li>
+</ol>
+
+<h3>Technischer Stack (Vorschlag)</h3>
+<div class="grid2">
+<div class="stack"><b>Framework</b>Next.js 15 (analog Website)</div>
+<div class="stack"><b>Sprache</b>TypeScript</div>
+<div class="stack"><b>Styling</b>TailwindCSS + BSt-Next-Design-Tokens</div>
+<div class="stack"><b>Komponenten</b>Radix UI / eigene Bibliothek</div>
+<div class="stack"><b>Formulare</b>React Hook Form + Zod-Validation</div>
+<div class="stack"><b>State</b>Server Actions + Zustand für Client-State</div>
+</div>
+
+<h3>Design-Regeln (Docky liefert Vorlagen)</h3>
+<ul>
+<li>Navy <code>#0B2545</code> / Lime <code>#A3E635</code> / Ink <code>#15191F</code> / Paper <code>#F8FAFC</code>.</li>
+<li>Archivo Black für Headlines, Inter für Body, JetBrains Mono für Code/Chevron.</li>
+<li>Chevron-Wasserzeichen unten rechts (3,5 %).</li>
+<li>Barrierefrei: WCAG 2.2 AA, Tastatur-Bedienbarkeit, <code>prefers-reduced-motion</code>.</li>
+</ul>
+
+<h3>Persona &amp; Regeln</h3>
+<ul>
+<li>Sprache Deutsch (EU), echte Umlaute, per Du mit catrin.</li>
+<li>Vor Bau: <b>Plan zeigen, Freigabe abholen</b> — nicht sofort umsetzen (catrins Standardregel).</li>
+<li>Tag-Regel: <b>neuer Tag NUR nach catrins „deployed"-Meldung</b>.</li>
+<li>Screenshots nach jedem UI-Baustein an Docky für CI-Check.</li>
+</ul>
+
+<h3>Deliverable-Reihenfolge</h3>
+<ol>
+<li>Sprint 1: Upload + Themen-Redaktion + W-Fragen-Formular (MVP).</li>
+<li>Sprint 2: Vorschau/Review + Export-Panel + Feedback.</li>
+<li>Sprint 3: SharePoint-Integration + Admin-Bereich.</li>
+</ol>
+</div>
+
+<h2>Zusammenarbeit</h2>
+<ul>
+<li><b>Ragy</b> exposiert OpenAPI-dokumentierte JSON-Endpunkte, <b>Formy</b> konsumiert sie ausschließlich über diese Vertragsschnittstelle (keine direkten DB-Zugriffe).</li>
+<li>Beide arbeiten in eigenen Forgejo-Repos (analog SortNext/BookNext).</li>
+<li><b>Docky</b> reviewt CI, Doku und Terminologie-Konsistenz vor jedem Deploy.</li>
+<li><b>catrin</b> gibt frei pro Sprint-Ende und triggert die Deploys selbst.</li>
+<li><b>Irony</b> wird bei Rechts-/Datenschutz-Fragen konsultiert (Rechtsquellen-Verifizierung, Nutzungsbedingungen für Standalone-Verkauf).</li>
+</ul>
+
+<h2>Was catrin beim Anlegen braucht</h2>
+<ul>
+<li>Zwei Forgejo-Repos (<code>scriptnext-backend</code>, <code>scriptnext-frontend</code>).</li>
+<li>Zwei Coolify-Dienste inkl. Volumes (Ragy: PostgreSQL + pgvector-Volume, Formy: keine Persistenz nötig).</li>
+<li>Zwei Agent-Kontexte in Pandora (kontext_id je Agent, so wie bei Weby/Sorty/Docky).</li>
+<li>Zwei Secrets zum Start: <code>ANTHROPIC_API_KEY</code> (Ragy) und ein SSO-Schlüssel (später, wenn Portal-Login angebunden wird).</li>
+</ul>
+
+<footer>
+ScriptNext · Agent-Anforderungen v0.1 · Stand 25.09.2026 · zusammengestellt von Docky auf Basis der Konzept-Diskussion mit catrin. Namen und Stack sind Vorschläge — änderbar bevor gebaut wird.
+</footer>
+
+<div class="chevron">&gt;</div>
+
+</body>
+</html>
