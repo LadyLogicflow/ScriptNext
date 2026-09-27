@@ -13,6 +13,15 @@ type Thema = {
   erstellt_am: string;
 };
 
+type VeralteterChunk = {
+  chunk_id: string;
+  thema_id: number;
+  thema_titel: string;
+  quelldatum: string;
+  veraltet_seit_tagen: number;
+  vorschlag: string;
+};
+
 export default function ThemenPage() {
   const router = useRouter();
   const [themen, setThemen] = useState<Thema[]>([]);
@@ -22,6 +31,9 @@ export default function ThemenPage() {
   const [bearbeitenTitel, setBearbeitenTitel] = useState("");
   const [bearbeitenBeschreibung, setBearbeitenBeschreibung] = useState("");
   const [mergeIds, setMergeIds] = useState<number[]>([]);
+  const [veralteteChunks, setVeralteteChunks] = useState<VeralteterChunk[]>([]);
+  const [selectedThemaWarnungen, setSelectedThemaWarnungen] = useState<VeralteterChunk[]>([]);
+  const [showWarnModal, setShowWarnModal] = useState(false);
 
   useEffect(() => {
     // Cookie-basierte Auth - kein Check mehr nötig
@@ -31,18 +43,27 @@ export default function ThemenPage() {
 
   async function laden() {
     try {
-      const res = await fetch(`${API_BASE}/api/v1/themen`, {
-        credentials: "include",
-      });
+      // Parallel: Themen + veraltete Chunks laden
+      const [themenRes, veraltetRes] = await Promise.all([
+        fetch(`${API_BASE}/api/v1/themen`, { credentials: "include" }),
+        fetch(`${API_BASE}/api/v1/chunks/veraltet`, { credentials: "include" }),
+      ]);
 
-      if (!res.ok) {
+      if (!themenRes.ok) {
         setFehler("Themen konnten nicht geladen werden");
         setLaedt(false);
         return;
       }
 
-      const data = await res.json();
-      setThemen(data.themen ?? []);
+      const themenData = await themenRes.json();
+      setThemen(themenData.themen ?? []);
+
+      // Veraltete Chunks (kann fehlschlagen, ist nicht kritisch)
+      if (veraltetRes.ok) {
+        const veraltetData = await veraltetRes.json();
+        setVeralteteChunks(veraltetData.items ?? []);
+      }
+
       setLaedt(false);
     } catch (err) {
       setFehler("Verbindung fehlgeschlagen");
@@ -150,6 +171,33 @@ export default function ThemenPage() {
     }
   }
 
+  function getVeralteteChunksForThema(themaId: number): VeralteterChunk[] {
+    return veralteteChunks.filter((c) => c.thema_id === themaId);
+  }
+
+  function getAeltestesQuelldat um(chunks: VeralteterChunk[]): string | null {
+    if (chunks.length === 0) return null;
+    const sorted = chunks.sort((a, b) =>
+      new Date(a.quelldatum).getTime() - new Date(b.quelldatum).getTime()
+    );
+    return sorted[0].quelldatum;
+  }
+
+  function formatDatum(datum: string): string {
+    try {
+      const d = new Date(datum);
+      return d.toLocaleDateString("de-DE");
+    } catch {
+      return datum;
+    }
+  }
+
+  function showWarnungen(themaId: number) {
+    const warnungen = getVeralteteChunksForThema(themaId);
+    setSelectedThemaWarnungen(warnungen);
+    setShowWarnModal(true);
+  }
+
   return (
     <main className="min-h-screen bg-gradient-to-b from-white to-gray-50 p-4">
       <div className="max-w-6xl mx-auto">
@@ -252,7 +300,24 @@ export default function ThemenPage() {
                     <>
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
-                          <h3 className="text-lg font-semibold text-navy mb-1">{thema.titel}</h3>
+                          <div className="flex items-center gap-2 mb-1">
+                            <h3 className="text-lg font-semibold text-navy">{thema.titel}</h3>
+                            {(() => {
+                              const warnungen = getVeralteteChunksForThema(thema.id);
+                              if (warnungen.length > 0) {
+                                const aeltestes = getAeltestesQuelldatum(warnungen);
+                                return (
+                                  <button
+                                    onClick={() => showWarnungen(thema.id)}
+                                    className="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-semibold hover:bg-yellow-200 transition flex items-center gap-1"
+                                  >
+                                    ⚠️ Gesetzeslage geändert {aeltestes && `am ${formatDatum(aeltestes)}`}
+                                  </button>
+                                );
+                              }
+                              return null;
+                            })()}
+                          </div>
                           <p className="text-gray-600 text-sm mb-2">{thema.beschreibung}</p>
                           <p className="text-gray-400 text-xs">
                             Erstellt am: {new Date(thema.erstellt_am).toLocaleString("de-DE")}
@@ -294,6 +359,71 @@ export default function ThemenPage() {
             </div>
           )}
         </div>
+
+        {/* Warn-Detail-Modal */}
+        {showWarnModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+            <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[80vh] overflow-y-auto">
+              <div className="sticky top-0 bg-white border-b border-gray-200 p-6">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <h2 className="text-2xl font-bold text-yellow-800 flex items-center gap-2">
+                      ⚠️ Veraltete Rechtsgrundlagen
+                    </h2>
+                    <p className="text-sm text-gray-600 mt-1">
+                      {selectedThemaWarnungen.length} Chunk{selectedThemaWarnungen.length !== 1 ? "s" : ""} betroffen
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => setShowWarnModal(false)}
+                    className="p-2 hover:bg-gray-100 rounded-lg transition"
+                  >
+                    <svg className="w-6 h-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              <div className="p-6 space-y-4">
+                {selectedThemaWarnungen.map((warnung, idx) => (
+                  <div key={idx} className="border border-yellow-200 bg-yellow-50 rounded-lg p-4">
+                    <div className="flex items-start justify-between mb-2">
+                      <h3 className="font-semibold text-gray-900">{warnung.thema_titel}</h3>
+                      <span className="text-xs text-gray-500">
+                        Veraltet seit {warnung.veraltet_seit_tagen} Tagen
+                      </span>
+                    </div>
+                    <p className="text-sm text-gray-700 mb-2">
+                      <strong>Quelldatum:</strong> {formatDatum(warnung.quelldatum)}
+                    </p>
+                    <div className="bg-white rounded-lg p-3 text-sm">
+                      <p className="text-gray-600">
+                        <strong>💡 Vorschlag:</strong> {warnung.vorschlag}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-4">
+                  <p className="text-sm text-blue-900">
+                    <strong>📋 Empfehlung:</strong> Bitte prüfen Sie die betroffenen Themen und laden Sie
+                    ggf. aktualisierte Dokumente hoch oder importieren Sie diese aus SharePoint.
+                  </p>
+                </div>
+
+                <div className="flex justify-end">
+                  <button
+                    onClick={() => setShowWarnModal(false)}
+                    className="px-6 py-3 bg-navy text-white rounded-lg font-semibold hover:bg-navy-700 transition"
+                  >
+                    Verstanden
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </main>
   );
