@@ -39,6 +39,9 @@ class Nutzer(Base):
     tenant_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("tenants.id"))
     benutzername: Mapped[str] = mapped_column(String(100), unique=True, index=True)
     passwort_hash: Mapped[str] = mapped_column(String(255))
+    rolle: Mapped[str] = mapped_column(
+        SAEnum("admin", "editor", "viewer", name="nutzer_rolle"), default="editor"
+    )
     erstellt_am: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
 
     tenant: Mapped["Tenant"] = relationship(back_populates="nutzer")

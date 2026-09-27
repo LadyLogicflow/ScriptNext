@@ -22,6 +22,11 @@ from config import settings
 from database import get_db, engine, Base
 import ingest as ingest_lib
 import models
+from slowapi import _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
+
+from admin import router as admin_router
+from rate_limit import limiter
 from sharepoint import router as sharepoint_router
 from rechtsquellen import router as rechtsquellen_router
 from feedback import router as feedback_router
@@ -33,6 +38,8 @@ app = FastAPI(
     version="0.1.0",
     description="KI-gestützte Skript-Analyse. Mandantenfähig.",
 )
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 _cors_origins = [o.strip() for o in settings.cors_allowed_origins.split(",") if o.strip()]
 app.add_middleware(
@@ -69,6 +76,7 @@ class _StripPrefixMiddleware(BaseHTTPMiddleware):
 if _PANDORA_PREFIX:
     app.add_middleware(_StripPrefixMiddleware)
 
+app.include_router(admin_router)
 app.include_router(sharepoint_router)
 app.include_router(rechtsquellen_router)
 app.include_router(feedback_router)
@@ -108,12 +116,13 @@ async def _sicherstelle_dev_admin():
             {"id": str(tenant_id), "name": "Admin", "ts": jetzt},
         )
         await conn.execute(
-            text("INSERT INTO nutzer (id, tenant_id, benutzername, passwort_hash, erstellt_am) VALUES (:id, :tid, :b, :h, :ts)"),
+            text("INSERT INTO nutzer (id, tenant_id, benutzername, passwort_hash, rolle, erstellt_am) VALUES (:id, :tid, :b, :h, :r, :ts)"),
             {
                 "id": str(uuid.uuid4()),
                 "tid": str(tenant_id),
                 "b": settings.admin_benutzername,
                 "h": settings.admin_passwort_hash,
+                "r": "admin",
                 "ts": jetzt,
             },
         )
@@ -234,13 +243,14 @@ class DokumentStatus(BaseModel):
 # ── Auth ──────────────────────────────────────────────────────────────────────
 
 @app.post("/api/v1/auth/login", response_model=TokenResponse, tags=["auth"])
-async def login(body: LoginRequest, response: Response, db: Annotated[AsyncSession, Depends(get_db)]):
+@limiter.limit("20/minute")
+async def login(request: Request, body: LoginRequest, response: Response, db: Annotated[AsyncSession, Depends(get_db)]):
     nutzer = await db.scalar(
         select(models.Nutzer).where(models.Nutzer.benutzername == body.benutzername)
     )
     if not nutzer or not verify_passwort(body.passwort, nutzer.passwort_hash):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Ungültige Anmeldedaten")
-    token = erstelle_token(nutzer.benutzername, nutzer.tenant_id)
+    token = erstelle_token(nutzer.benutzername, nutzer.tenant_id, nutzer.rolle)
     response.set_cookie(
         key=COOKIE_NAME,
         value=token,
@@ -601,7 +611,9 @@ async def thema_split(
 # ── Seminare ──────────────────────────────────────────────────────────────────
 
 @app.post("/api/v1/seminare/generieren", response_model=SeminarSchema, tags=["seminare"])
+@limiter.limit("10/minute")
 async def seminar_generieren(
+    request: Request,
     body: SeminarGenerierenRequest,
     nutzer_token: Annotated[TokenPayload, Depends(aktueller_nutzer)],
     db: Annotated[AsyncSession, Depends(get_db)],
