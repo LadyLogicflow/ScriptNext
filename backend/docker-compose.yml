@@ -1,0 +1,37 @@
+version: "3.9"
+
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_USER: scriptnext
+      POSTGRES_PASSWORD: scriptnext
+      POSTGRES_DB: scriptnext
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U scriptnext"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  backend:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      SCRIPTNEXT_DATABASE_URL: postgresql+asyncpg://scriptnext:scriptnext@db:5432/scriptnext
+      SCRIPTNEXT_DATABASE_URL_SYNC: postgresql://scriptnext:scriptnext@db:5432/scriptnext
+      # DEV-ONLY: vor Prod-Deploy ersetzen!
+      SCRIPTNEXT_JWT_SECRET: "dev-secret-REPLACE-IN-PROD"
+      SCRIPTNEXT_ADMIN_BENUTZERNAME: "admin"
+      # SCRIPTNEXT_ADMIN_PASSWORT_HASH: "bcrypt-hash-hier-eintragen"
+      # SCRIPTNEXT_OPENAI_API_KEY: "sk-..."
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  pgdata:
