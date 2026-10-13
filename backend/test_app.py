@@ -214,6 +214,29 @@ class TestLoginRouteDirekt:
         assert _decode_token(antwort.access_token).muss_passwort_aendern is True
 
 
+class TestNutzerTabelleHatDbSeitigenDefault:
+    """Docky, 13.10.2026: echter Erst-Deploy-Crash auf dem Pi -- das rohe
+    SQL-INSERT in _sicherstelle_dev_admin() nennt muss_passwort_aendern
+    nicht, auf einer FRISCHEN DB (kein ORM-INSERT zuvor) verletzt das die
+    NOT-NULL-Constraint. Ein reiner Mock haette das nicht gefunden (Mocks
+    pruefen keine DB-Constraints) -- deshalb hier gegen die tatsaechlich
+    generierte DDL, nicht gegen eine Mock-Session."""
+
+    def test_muss_passwort_aendern_hat_server_default(self):
+        from sqlalchemy.schema import CreateTable
+        from sqlalchemy.dialects import postgresql
+        import models
+
+        ddl = str(CreateTable(models.Nutzer.__table__).compile(
+            dialect=postgresql.dialect()))
+        zeile = next(l for l in ddl.splitlines() if "muss_passwort_aendern" in l)
+        assert "DEFAULT" in zeile, (
+            "Spalte hat keinen DB-seitigen Default -- ein rohes INSERT ohne "
+            "diese Spalte verletzt auf einer frischen DB die NOT-NULL-"
+            "Constraint (siehe Docky, echter Erst-Deploy-Crash)."
+        )
+
+
 class TestSicherstelleDevAdmin:
     """Etappe 4c (Docky, 13.10.2026, Pi-Erst-Deploy): SCRIPTNEXT_ADMIN_EMAIL/
     _PASSWORT (Klartext) hat Vorrang vor dem aelteren _BENUTZERNAME/

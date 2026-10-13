@@ -45,7 +45,16 @@ class Nutzer(Base):
     # catrin, 13.10.2026 (Etappe 4a): nach einem Admin-Passwort-Reset muss der
     # Nutzer das (feste) temporaere Passwort beim naechsten Login sofort
     # aendern -- erzwungen in auth.aktueller_nutzer(), nicht nur im Frontend.
-    muss_passwort_aendern: Mapped[bool] = mapped_column(Boolean, default=False)
+    #
+    # Docky, 13.10.2026 (echter Erst-Deploy-Crash auf dem Pi): "default"
+    # ist ein reiner ORM-/Python-seitiger Default -- er greift NICHT bei
+    # app._sicherstelle_dev_admin()s rohem SQL-INSERT (bypasst die ORM
+    # komplett). Auf einer bestehenden DB fiel das nie auf (dort hatte die
+    # Spalte schon Werte), auf einer frischen DB verletzt das rohe INSERT
+    # sofort die NOT-NULL-Constraint. "server_default" ist ein echter
+    # DB-seitiger Default und greift auch bei rohem SQL.
+    muss_passwort_aendern: Mapped[bool] = mapped_column(
+        Boolean, default=False, server_default="false")
     erstellt_am: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
 
     tenant: Mapped["Tenant"] = relationship(back_populates="nutzer")
