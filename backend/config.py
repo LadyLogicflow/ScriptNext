@@ -16,6 +16,15 @@ class Settings(BaseSettings):
     # DEV-Default: "1Admin&BStNext" — vor Prod-Deploy über Env-Var überschreiben
     admin_passwort_hash: str = "$2b$12$bDQBHCWCZDm9zwwhaReG5e3NnYaQYbGTs3BuLFIrO/A3x3LszehHq"
 
+    # Docky, 13.10.2026 (Etappe 4c, Pi-Deploy): einfacherer Bootstrap fuer den
+    # Erst-Deploy -- ein Klartext-Passwort per Env-Var statt eines vorher
+    # von Hand berechneten bcrypt-Hashes. Gesetzt (beide nicht leer) hat das
+    # Vorrang vor admin_benutzername/admin_passwort_hash, siehe
+    # app._sicherstelle_dev_admin(). Das Passwort landet NIE in der DB im
+    # Klartext, nur sein Hash -- nur die ENV-VAR selbst ist Klartext.
+    admin_email: str = ""
+    admin_passwort: str = ""
+
     # CORS — kommagetrennte Origins, kein Wildcard wenn Cookies genutzt werden
     cors_allowed_origins: str = "http://localhost:3000"
 

@@ -96,16 +96,32 @@ async def startup():
 
 
 async def _sicherstelle_dev_admin():
-    """Legt den Admin-Nutzer an wenn er noch nicht existiert (DEV-ONLY)."""
-    if not settings.admin_passwort_hash:
-        logger.warning("SCRIPTNEXT_ADMIN_PASSWORT_HASH nicht gesetzt — kein Admin angelegt")
+    """Legt den Admin-Nutzer an wenn er noch nicht existiert (DEV-ONLY).
+
+    Docky, 13.10.2026 (Etappe 4c, Pi-Erst-Deploy): SCRIPTNEXT_ADMIN_EMAIL +
+    SCRIPTNEXT_ADMIN_PASSWORT (Klartext, beide gesetzt) haben Vorrang vor
+    dem aelteren SCRIPTNEXT_ADMIN_BENUTZERNAME/_PASSWORT_HASH-Mechanismus --
+    einfacher fuer einen Erst-Deploy, kein vorab per Hand berechneter Hash
+    noetig. Gehasht wird erst HIER, beim Anlegen; das Klartext-Passwort
+    landet nie in der Datenbank.
+    """
+    if settings.admin_email and settings.admin_passwort:
+        benutzername = settings.admin_email
+        passwort_hash = hash_passwort(settings.admin_passwort)
+    elif settings.admin_passwort_hash:
+        benutzername = settings.admin_benutzername
+        passwort_hash = settings.admin_passwort_hash
+    else:
+        logger.warning(
+            "Weder SCRIPTNEXT_ADMIN_EMAIL/_PASSWORT noch "
+            "SCRIPTNEXT_ADMIN_PASSWORT_HASH gesetzt — kein Admin angelegt")
         return
     from datetime import datetime, timezone
     from sqlalchemy import text
     async with engine.begin() as conn:
         result = await conn.execute(
             text("SELECT id FROM nutzer WHERE benutzername = :b"),
-            {"b": settings.admin_benutzername},
+            {"b": benutzername},
         )
         if result.fetchone():
             return
@@ -120,13 +136,13 @@ async def _sicherstelle_dev_admin():
             {
                 "id": str(uuid.uuid4()),
                 "tid": str(tenant_id),
-                "b": settings.admin_benutzername,
-                "h": settings.admin_passwort_hash,
+                "b": benutzername,
+                "h": passwort_hash,
                 "r": "admin",
                 "ts": jetzt,
             },
         )
-        logger.info("Dev-Admin '%s' angelegt (Tenant %s)", settings.admin_benutzername, tenant_id)
+        logger.info("Dev-Admin '%s' angelegt (Tenant %s)", benutzername, tenant_id)
 
 
 # ── Schemas ───────────────────────────────────────────────────────────────────

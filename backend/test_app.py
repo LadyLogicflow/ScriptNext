@@ -214,6 +214,92 @@ class TestLoginRouteDirekt:
         assert _decode_token(antwort.access_token).muss_passwort_aendern is True
 
 
+class TestSicherstelleDevAdmin:
+    """Etappe 4c (Docky, 13.10.2026, Pi-Erst-Deploy): SCRIPTNEXT_ADMIN_EMAIL/
+    _PASSWORT (Klartext) hat Vorrang vor dem aelteren _BENUTZERNAME/
+    _PASSWORT_HASH-Mechanismus. engine wird gemockt, kein echtes DB noetig
+    -- dasselbe Prinzip wie die Mock-DB-Tests in test_admin.py."""
+
+    def _mock_engine_begin(self, fetchone_ergebnis=None):
+        """Liefert (engine_mock, conn_mock) -- conn.execute() liefert ein
+        Objekt, dessen fetchone() den uebergebenen Wert zurueckgibt."""
+        conn = AsyncMock()
+        exec_result = MagicMock()
+        exec_result.fetchone = MagicMock(return_value=fetchone_ergebnis)
+        conn.execute = AsyncMock(return_value=exec_result)
+
+        class _CtxMgr:
+            async def __aenter__(self2):
+                return conn
+
+            async def __aexit__(self2, *a):
+                return False
+
+        engine_mock = MagicMock()
+        engine_mock.begin = MagicMock(return_value=_CtxMgr())
+        return engine_mock, conn
+
+    def test_klartext_passwort_hat_vorrang(self):
+        import asyncio
+        import app as app_mod
+        from auth import verify_passwort
+
+        engine_mock, conn = self._mock_engine_begin(fetchone_ergebnis=None)
+        with patch.object(app_mod, "engine", engine_mock), \
+             patch.object(app_mod.settings, "admin_email", "admin@bst-next.de"), \
+             patch.object(app_mod.settings, "admin_passwort", "KlartextPasswort123!"), \
+             patch.object(app_mod.settings, "admin_passwort_hash", "sollte-ignoriert-werden"):
+            asyncio.run(app_mod._sicherstelle_dev_admin())
+
+        insert_call = conn.execute.call_args_list[-1]
+        params = insert_call.args[1]
+        assert params["b"] == "admin@bst-next.de"
+        assert verify_passwort("KlartextPasswort123!", params["h"])
+
+    def test_fallback_auf_passwort_hash_ohne_klartext(self):
+        import asyncio
+        import app as app_mod
+
+        engine_mock, conn = self._mock_engine_begin(fetchone_ergebnis=None)
+        with patch.object(app_mod, "engine", engine_mock), \
+             patch.object(app_mod.settings, "admin_email", ""), \
+             patch.object(app_mod.settings, "admin_passwort", ""), \
+             patch.object(app_mod.settings, "admin_benutzername", "admin"), \
+             patch.object(app_mod.settings, "admin_passwort_hash", "ein-fertiger-hash"):
+            asyncio.run(app_mod._sicherstelle_dev_admin())
+
+        insert_call = conn.execute.call_args_list[-1]
+        params = insert_call.args[1]
+        assert params["b"] == "admin"
+        assert params["h"] == "ein-fertiger-hash"
+
+    def test_weder_klartext_noch_hash_legt_keinen_admin_an(self):
+        import asyncio
+        import app as app_mod
+
+        engine_mock, conn = self._mock_engine_begin(fetchone_ergebnis=None)
+        with patch.object(app_mod, "engine", engine_mock), \
+             patch.object(app_mod.settings, "admin_email", ""), \
+             patch.object(app_mod.settings, "admin_passwort", ""), \
+             patch.object(app_mod.settings, "admin_passwort_hash", ""):
+            asyncio.run(app_mod._sicherstelle_dev_admin())
+
+        conn.execute.assert_not_called()
+
+    def test_bestehender_admin_wird_nicht_doppelt_angelegt(self):
+        import asyncio
+        import app as app_mod
+
+        engine_mock, conn = self._mock_engine_begin(fetchone_ergebnis=("vorhandene-id",))
+        with patch.object(app_mod, "engine", engine_mock), \
+             patch.object(app_mod.settings, "admin_email", "admin@bst-next.de"), \
+             patch.object(app_mod.settings, "admin_passwort", "KlartextPasswort123!"):
+            asyncio.run(app_mod._sicherstelle_dev_admin())
+
+        # Nur der SELECT, kein INSERT.
+        assert conn.execute.call_count == 1
+
+
 class TestPasswortAendernHebtSperreAuf:
     def test_erfolgreicher_wechsel_setzt_flag_zurueck(self):
         import asyncio
