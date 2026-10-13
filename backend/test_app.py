@@ -1,6 +1,6 @@
 """Tests für ScriptNext Backend."""
 import uuid
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch, MagicMock, AsyncMock
 
 import pytest
 from fastapi.testclient import TestClient
@@ -130,6 +130,112 @@ class TestLoginEndpoint:
             response = client.get("/health")
             # Kann 500 geben wenn Startup-Hook DB braucht
             assert response.status_code in (200, 500)
+
+
+# ── Login-Route direkt aufgerufen (Etappe 4a, catrin 13.10.2026) ────────────
+# TestClient braucht eine laufende DB (Startup-Hook) -- die Route-Funktion
+# selbst nicht, siehe test_admin.py::TestNutzerCrud fuer dasselbe Muster.
+
+class TestLoginRouteDirekt:
+    def _request(self):
+        req = MagicMock()
+        req.app.state.limiter = MagicMock()
+        return req
+
+    def test_freundliche_fehlermeldung_ohne_enumeration(self):
+        """Weder 'Nutzer existiert nicht' noch 'Passwort falsch' -- derselbe
+        Text fuer beide Faelle, aber nicht mehr der alte knappe 401-Text."""
+        import asyncio
+        import app as app_mod
+        from fastapi import HTTPException, Response
+
+        mock_db = AsyncMock()
+        mock_db.scalar = AsyncMock(return_value=None)  # Nutzer existiert nicht
+
+        with pytest.raises(HTTPException) as exc:
+            asyncio.run(app_mod.login.__wrapped__(
+                request=self._request(),
+                body=app_mod.LoginRequest(benutzername="unbekannt", passwort="x"),
+                response=Response(),
+                db=mock_db,
+            ))
+        assert exc.value.status_code == 401
+        assert exc.value.detail == "Benutzername oder Passwort ist falsch. Bitte prüfen Sie Ihre Eingabe."
+
+    def test_falsches_passwort_dieselbe_meldung(self):
+        """Existierender Nutzer, falsches Passwort -- IDENTISCHER Text wie bei
+        unbekanntem Benutzernamen (Schutz vor Enumeration)."""
+        import asyncio
+        import app as app_mod
+        from auth import hash_passwort
+        from fastapi import HTTPException, Response
+
+        mock_nutzer = MagicMock()
+        mock_nutzer.passwort_hash = hash_passwort("richtiges-passwort")
+        mock_db = AsyncMock()
+        mock_db.scalar = AsyncMock(return_value=mock_nutzer)
+
+        with pytest.raises(HTTPException) as exc:
+            asyncio.run(app_mod.login.__wrapped__(
+                request=self._request(),
+                body=app_mod.LoginRequest(benutzername="user1", passwort="falsch"),
+                response=Response(),
+                db=mock_db,
+            ))
+        assert exc.value.detail == "Benutzername oder Passwort ist falsch. Bitte prüfen Sie Ihre Eingabe."
+
+    def test_login_gibt_muss_passwort_aendern_weiter(self):
+        """Ein Nutzer mit gesetztem Reset-Flag bekommt das im Token UND in
+        der Antwort gespiegelt, damit das Frontend sofort reagieren kann."""
+        import asyncio
+        import uuid as _uuid
+        import app as app_mod
+        from auth import hash_passwort, _decode_token
+        from fastapi import Response
+
+        mock_nutzer = MagicMock()
+        mock_nutzer.benutzername = "user1"
+        mock_nutzer.tenant_id = _uuid.uuid4()
+        mock_nutzer.rolle = "editor"
+        mock_nutzer.passwort_hash = hash_passwort("BStNext_2026!")
+        mock_nutzer.muss_passwort_aendern = True
+
+        mock_db = AsyncMock()
+        mock_db.scalar = AsyncMock(return_value=mock_nutzer)
+
+        antwort = asyncio.run(app_mod.login.__wrapped__(
+            request=self._request(),
+            body=app_mod.LoginRequest(benutzername="user1", passwort="BStNext_2026!"),
+            response=Response(),
+            db=mock_db,
+        ))
+
+        assert antwort.muss_passwort_aendern is True
+        assert _decode_token(antwort.access_token).muss_passwort_aendern is True
+
+
+class TestPasswortAendernHebtSperreAuf:
+    def test_erfolgreicher_wechsel_setzt_flag_zurueck(self):
+        import asyncio
+        import app as app_mod
+        from auth import hash_passwort, TokenPayload
+
+        mock_nutzer = MagicMock()
+        mock_nutzer.passwort_hash = hash_passwort("altes-temp-passwort")
+        mock_nutzer.muss_passwort_aendern = True
+
+        mock_db = AsyncMock()
+        mock_db.scalar = AsyncMock(return_value=mock_nutzer)
+
+        asyncio.run(app_mod.passwort_aendern(
+            body=app_mod.PasswortAendernRequest(
+                altes_passwort="altes-temp-passwort", neues_passwort="neuesPasswort123!"),
+            nutzer_token=TokenPayload(sub="user1", tenant_id="t", muss_passwort_aendern=True),
+            db=mock_db,
+        ))
+
+        assert mock_nutzer.muss_passwort_aendern is False
+        mock_db.commit.assert_called_once()
 
 
 class TestThemenEndpoints:

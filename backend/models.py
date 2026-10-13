@@ -2,7 +2,7 @@
 import uuid
 from datetime import datetime, timezone
 
-from sqlalchemy import String, Integer, Text, DateTime, ForeignKey, Enum as SAEnum
+from sqlalchemy import String, Integer, Text, DateTime, ForeignKey, Enum as SAEnum, Boolean
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -42,6 +42,10 @@ class Nutzer(Base):
     rolle: Mapped[str] = mapped_column(
         SAEnum("admin", "editor", "viewer", name="nutzer_rolle"), default="editor"
     )
+    # catrin, 13.10.2026 (Etappe 4a): nach einem Admin-Passwort-Reset muss der
+    # Nutzer das (feste) temporaere Passwort beim naechsten Login sofort
+    # aendern -- erzwungen in auth.aktueller_nutzer(), nicht nur im Frontend.
+    muss_passwort_aendern: Mapped[bool] = mapped_column(Boolean, default=False)
     erstellt_am: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now)
 
     tenant: Mapped["Tenant"] = relationship(back_populates="nutzer")

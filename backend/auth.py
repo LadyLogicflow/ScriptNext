@@ -23,12 +23,24 @@ class TokenPayload(BaseModel):
     tenant_id: str
     scope: str = "scriptnext"
     rolle: str = "editor"
+    muss_passwort_aendern: bool = False
 
 
 class TokenResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
     tenant_id: str
+    muss_passwort_aendern: bool = False
+
+
+# catrin, 13.10.2026 (Etappe 4a): Pfade, die auch mit
+# muss_passwort_aendern=True erreichbar bleiben -- der erzwungene
+# Passwortwechsel selbst und das Abmelden. Alles andere wird fuer
+# diesen Nutzer gesperrt, bis das Passwort geaendert wurde.
+_PASSWORTWECHSEL_AUSGENOMMENE_PFADE = frozenset({
+    "/api/v1/auth/passwort-aendern",
+    "/api/v1/auth/logout",
+})
 
 
 def hash_passwort(passwort: str) -> str:
@@ -39,13 +51,15 @@ def verify_passwort(passwort: str, hashed: str) -> bool:
     return pwd_context.verify(passwort, hashed)
 
 
-def erstelle_token(benutzername: str, tenant_id: uuid.UUID, rolle: str = "editor") -> str:
+def erstelle_token(benutzername: str, tenant_id: uuid.UUID, rolle: str = "editor",
+                   muss_passwort_aendern: bool = False) -> str:
     ablauf = datetime.now(timezone.utc) + timedelta(minutes=settings.jwt_expire_minutes)
     payload = {
         "sub": benutzername,
         "tenant_id": str(tenant_id),
         "scope": "scriptnext",
         "rolle": rolle,
+        "muss_passwort_aendern": muss_passwort_aendern,
         "exp": ablauf,
     }
     return jwt.encode(payload, settings.jwt_secret, algorithm=settings.jwt_algorithm)
@@ -66,6 +80,7 @@ def _decode_token(token: str) -> TokenPayload:
             tenant_id=payload["tenant_id"],
             scope=payload["scope"],
             rolle=payload.get("rolle", "editor"),
+            muss_passwort_aendern=payload.get("muss_passwort_aendern", False),
         )
     except JWTError:
         raise exc
@@ -90,7 +105,17 @@ async def aktueller_nutzer(
             detail="Nicht authentifiziert",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    return _decode_token(token)
+    token_data = _decode_token(token)
+
+    # catrin, 13.10.2026 (Etappe 4a): nach einem Admin-Passwort-Reset ist der
+    # Nutzer auf den erzwungenen Passwortwechsel beschraenkt -- serverseitig
+    # durchgesetzt, nicht nur im Frontend verborgen.
+    if token_data.muss_passwort_aendern and request.url.path not in _PASSWORTWECHSEL_AUSGENOMMENE_PFADE:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Passwort muss vor der weiteren Nutzung geändert werden",
+        )
+    return token_data
 
 
 async def admin_erforderlich(

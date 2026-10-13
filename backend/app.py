@@ -249,8 +249,15 @@ async def login(request: Request, body: LoginRequest, response: Response, db: An
         select(models.Nutzer).where(models.Nutzer.benutzername == body.benutzername)
     )
     if not nutzer or not verify_passwort(body.passwort, nutzer.passwort_hash):
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Ungültige Anmeldedaten")
-    token = erstelle_token(nutzer.benutzername, nutzer.tenant_id, nutzer.rolle)
+        # catrin, 13.10.2026 (Etappe 4a): freundlichere Formulierung -- aber
+        # bewusst weiterhin OHNE zu verraten, ob der Benutzername existiert
+        # oder nur das Passwort falsch war (Schutz vor Benutzername-Enumeration).
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Benutzername oder Passwort ist falsch. Bitte prüfen Sie Ihre Eingabe.",
+        )
+    token = erstelle_token(nutzer.benutzername, nutzer.tenant_id, nutzer.rolle,
+                           nutzer.muss_passwort_aendern)
     response.set_cookie(
         key=COOKIE_NAME,
         value=token,
@@ -260,7 +267,8 @@ async def login(request: Request, body: LoginRequest, response: Response, db: An
         samesite="lax",
         path="/",
     )
-    return TokenResponse(access_token=token, tenant_id=str(nutzer.tenant_id))
+    return TokenResponse(access_token=token, tenant_id=str(nutzer.tenant_id),
+                         muss_passwort_aendern=nutzer.muss_passwort_aendern)
 
 
 @app.post("/api/v1/auth/logout", status_code=status.HTTP_204_NO_CONTENT, tags=["auth"])
@@ -280,6 +288,9 @@ async def passwort_aendern(
     if not nutzer or not verify_passwort(body.altes_passwort, nutzer.passwort_hash):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Altes Passwort falsch")
     nutzer.passwort_hash = hash_passwort(body.neues_passwort)
+    # catrin, 13.10.2026 (Etappe 4a): nach einem erzwungenen Reset hebt der
+    # erfolgreiche Passwortwechsel die Sperre wieder auf.
+    nutzer.muss_passwort_aendern = False
     await db.commit()
 
 

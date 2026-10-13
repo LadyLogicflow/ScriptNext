@@ -15,6 +15,12 @@ router = APIRouter(prefix="/api/v1/admin", tags=["admin"])
 
 ROLLEN = ("admin", "editor", "viewer")
 
+# catrin, 13.10.2026 (Etappe 4a): "Passwort vergessen" braucht kein
+# E-Mail-Feld/SMTP (beides existiert hier noch nicht) -- der Admin setzt
+# stattdessen ein festes temporaeres Passwort, das der Nutzer beim naechsten
+# Login erzwungen aendern muss (siehe auth._PASSWORTWECHSEL_AUSGENOMMENE_PFADE).
+TEMPORAERES_PASSWORT = "BStNext_2026!"
+
 
 # ── Schemas ───────────────────────────────────────────────────────────────────
 
@@ -35,6 +41,11 @@ class NutzerAntwort(BaseModel):
     rolle: str
     tenant_id: uuid.UUID
     erstellt_am: str
+
+
+class PasswortResetAntwort(BaseModel):
+    benutzername: str
+    temporaeres_passwort: str
 
 
 # ── Endpoints ─────────────────────────────────────────────────────────────────
@@ -125,6 +136,32 @@ async def rolle_aendern(
         rolle=nutzer.rolle,
         tenant_id=nutzer.tenant_id,
         erstellt_am=nutzer.erstellt_am.isoformat(),
+    ).model_dump()
+
+
+@router.post("/nutzer/{nutzer_id}/passwort-zuruecksetzen")
+async def passwort_zuruecksetzen(
+    nutzer_id: uuid.UUID,
+    token_data: Annotated[TokenPayload, Depends(admin_erforderlich)],
+    db: Annotated[AsyncSession, Depends(get_db)],
+):
+    """Setzt das Passwort eines Nutzers auf ein festes temporaeres Passwort
+    zurueck (Admin only) -- catrins Entscheidung vom 13.10.2026 (Etappe 4a):
+    kein E-Mail-Versand, der Admin gibt das angezeigte temporaere Passwort
+    direkt an den Nutzer weiter. Der Nutzer muss es beim naechsten Login
+    sofort aendern (muss_passwort_aendern, serverseitig in
+    auth.aktueller_nutzer() durchgesetzt)."""
+    nutzer = await db.get(models.Nutzer, nutzer_id)
+    if not nutzer:
+        raise HTTPException(404, "Nutzer nicht gefunden")
+
+    nutzer.passwort_hash = hash_passwort(TEMPORAERES_PASSWORT)
+    nutzer.muss_passwort_aendern = True
+    await db.commit()
+
+    return PasswortResetAntwort(
+        benutzername=nutzer.benutzername,
+        temporaeres_passwort=TEMPORAERES_PASSWORT,
     ).model_dump()
 
 

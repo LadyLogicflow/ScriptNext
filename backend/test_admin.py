@@ -298,6 +298,132 @@ class TestNutzerCrud:
         mock_db.commit.assert_called_once()
 
 
+# ── Passwort-Reset (Etappe 4a, catrin 13.10.2026) ────────────────────────────
+
+class TestPasswortReset:
+    def _admin_token(self):
+        from auth import TokenPayload
+        return TokenPayload(sub="admin", tenant_id=str(uuid.uuid4()), rolle="admin")
+
+    def test_reset_setzt_festes_temp_passwort_und_sperr_flag(self):
+        import asyncio
+        import admin as admin_mod
+        from auth import verify_passwort
+
+        nutzer_id = uuid.uuid4()
+        mock_nutzer = MagicMock()
+        mock_nutzer.id = nutzer_id
+        mock_nutzer.benutzername = "user1"
+        mock_nutzer.passwort_hash = "alter-hash"
+        mock_nutzer.muss_passwort_aendern = False
+
+        mock_db = AsyncMock()
+        mock_db.get = AsyncMock(return_value=mock_nutzer)
+
+        result = asyncio.run(admin_mod.passwort_zuruecksetzen(
+            nutzer_id=nutzer_id,
+            token_data=self._admin_token(),
+            db=mock_db,
+        ))
+
+        assert result["temporaeres_passwort"] == admin_mod.TEMPORAERES_PASSWORT
+        assert result["benutzername"] == "user1"
+        assert mock_nutzer.muss_passwort_aendern is True
+        assert verify_passwort(admin_mod.TEMPORAERES_PASSWORT, mock_nutzer.passwort_hash)
+        mock_db.commit.assert_called_once()
+
+    def test_reset_nutzer_nicht_gefunden_404(self):
+        import asyncio
+        import admin as admin_mod
+        from fastapi import HTTPException
+
+        mock_db = AsyncMock()
+        mock_db.get = AsyncMock(return_value=None)
+
+        with pytest.raises(HTTPException) as exc:
+            asyncio.run(admin_mod.passwort_zuruecksetzen(
+                nutzer_id=uuid.uuid4(),
+                token_data=self._admin_token(),
+                db=mock_db,
+            ))
+        assert exc.value.status_code == 404
+
+    def test_reset_erfordert_admin(self):
+        """Dieselbe admin_erforderlich-Dependency wie die anderen Admin-
+        Endpoints -- editor/viewer duerfen nicht zuruecksetzen."""
+        import asyncio
+        from auth import admin_erforderlich, TokenPayload
+        from fastapi import HTTPException
+
+        token = TokenPayload(sub="user1", tenant_id=str(uuid.uuid4()), rolle="editor")
+        with pytest.raises(HTTPException) as exc:
+            asyncio.run(admin_erforderlich(token))
+        assert exc.value.status_code == 403
+
+
+# ── Erzwungener Passwortwechsel (Etappe 4a) ──────────────────────────────────
+
+class TestErzwungenerPasswortwechsel:
+    def _request(self, path: str):
+        from unittest.mock import MagicMock as _MM
+        req = _MM()
+        req.url.path = path
+        req.cookies = {}
+        return req
+
+    def test_gesperrter_nutzer_wird_auf_anderen_pfaden_blockiert(self):
+        import asyncio
+        from auth import aktueller_nutzer, erstelle_token
+        from fastapi import HTTPException
+
+        token = erstelle_token("user1", uuid.uuid4(), "editor", muss_passwort_aendern=True)
+
+        class _Creds:
+            credentials = token
+
+        with pytest.raises(HTTPException) as exc:
+            asyncio.run(aktueller_nutzer(self._request("/api/v1/themen"), _Creds()))
+        assert exc.value.status_code == 403
+
+    def test_gesperrter_nutzer_darf_passwort_aendern(self):
+        import asyncio
+        from auth import aktueller_nutzer, erstelle_token
+
+        token = erstelle_token("user1", uuid.uuid4(), "editor", muss_passwort_aendern=True)
+
+        class _Creds:
+            credentials = token
+
+        result = asyncio.run(
+            aktueller_nutzer(self._request("/api/v1/auth/passwort-aendern"), _Creds()))
+        assert result.muss_passwort_aendern is True
+
+    def test_gesperrter_nutzer_darf_sich_abmelden(self):
+        import asyncio
+        from auth import aktueller_nutzer, erstelle_token
+
+        token = erstelle_token("user1", uuid.uuid4(), "editor", muss_passwort_aendern=True)
+
+        class _Creds:
+            credentials = token
+
+        result = asyncio.run(
+            aktueller_nutzer(self._request("/api/v1/auth/logout"), _Creds()))
+        assert result.muss_passwort_aendern is True
+
+    def test_normaler_nutzer_bleibt_unbetroffen(self):
+        import asyncio
+        from auth import aktueller_nutzer, erstelle_token
+
+        token = erstelle_token("user1", uuid.uuid4(), "editor")  # Default False
+
+        class _Creds:
+            credentials = token
+
+        result = asyncio.run(aktueller_nutzer(self._request("/api/v1/themen"), _Creds()))
+        assert result.muss_passwort_aendern is False
+
+
 # ── Rate-Limit ────────────────────────────────────────────────────────────────
 
 class TestRateLimit:
