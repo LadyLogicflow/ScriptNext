@@ -175,7 +175,7 @@ export default function ThemenPage() {
     return veralteteChunks.filter((c) => c.thema_id === themaId);
   }
 
-  function getAeltestesQuelldat um(chunks: VeralteterChunk[]): string | null {
+  function getAeltestesQuelldatum(chunks: VeralteterChunk[]): string | null {
     if (chunks.length === 0) return null;
     const sorted = chunks.sort((a, b) =>
       new Date(a.quelldatum).getTime() - new Date(b.quelldatum).getTime()

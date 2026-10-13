@@ -11,6 +11,12 @@ RUN npm ci
 # Copy source code
 COPY . .
 
+# NEXT_PUBLIC_-Variablen werden von Next.js beim Build fest in den
+# Client-Bundle einkompiliert, nicht zur Laufzeit gelesen -- muessen also
+# hier als ARG/ENV ankommen, nicht erst im fertigen Image gesetzt werden.
+ARG NEXT_PUBLIC_API_BASE
+ENV NEXT_PUBLIC_API_BASE=$NEXT_PUBLIC_API_BASE
+
 # Build Next.js app
 RUN npm run build
 
